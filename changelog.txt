@@ -1,0 +1,235 @@
+Version 2.3.1
+-------------
+* Added support for the new Twisted Treeline mode and items
+* Changed default recommended items to load from the client databases if possible
+* Overhauled LoL directory IO system, should hopefully work better for SEA users (Mac version coming eventually)
+* Fixed a rare crash when opening on some JREs
+* Other minor fixes
+
+Version 2.3.0
+-------------
+* Added all-mid game mode
+* Loads Champion information from the client databases rather than a local data file, Champions should now show up directly after a patch
+* Sorts items starting at the first significant character (ignores "The")
+* Cache files are downloaded if missing
+* Minor interface changes
+* Changed program icon
+
+Version 2.2.1
+-------------
+* Fixed an issue with cache updating (Dropbox stopped working properly)
+* Fixed about dialog text
+
+Version 2.2.0
+-------------
+* Added list item display mode
+* Added localization
+* Added double-click support to items (double click to add to build)
+* Added warning if game is not up to date
+* Added new easter egg (courtesy of Cilbanus)
+* Improved importing and exporting of item sets
+* Improved support for SEA clients
+* Updated update system to update the updater (will require a manual update to update the updater)
+* Updated cache update system to be faster
+* Changed item selection color
+* Changed champion selection drop-down menu to clear filters when closed
+* Fixed character folder menu item not opening the character folder
+* Other small additions and changes
+
+Version 2.1.1
+-------------
+* Added splash screen (so you know it's loading)
+* Added champion filters
+* Added option to minimize to the system tray (click to maximize)
+* Improved look of champion selection drop-down box
+* Improved LoL directory searching
+* Fixed champion select menu opening slowly on first click
+* Fixed an issue that caused imports to fail
+* Fixed loading issue with SEA clients (will require the path to be reset once)
+* Other minor UI changes
+
+Version 2.1.0
+-------------
+* Added ability to click items and filter by built-from and builds-into
+* Added automatic backup and backup restoring
+* Improved options menu organization
+* Improved unknown error handling
+* Other minor changes
+
+Version 2.0.4
+-------------
+* Added ability to add, duplicate, and copy existing builds to Build menu
+* Improved layout and look of dialog windows
+* Champion list refreshes after manually updating the cache
+* Fixed champion selection menu jumping back when scrolling with keyboard
+* Fixed an issue that caused the Locket of the Iron Solari image to be missing
+* Fixed an issue with the updater
+
+Version 2.0.3
+-------------
+* Fixed a major startup problem when updating is enabled
+
+Version 2.0.2
+-------------
+* Set edited items to persist when changing item sets (but not changing champions)
+* Set the current champion icon to not show on the champion selection combobox
+* Added item hover glow
+* Made items removable from the item set by dragging the item into the item pool
+* Updated item tooltips and tooltip display
+* Added more champion titles
+* Minor UI updates, including improving component padding
+* Updated updater to support back-end updates
+* Fixed tooltips not displaying the available game mode properly
+* Fixed item set list selection not rendering
+* Fixed rendering of item images outside the scroll area when resizing the window
+* Fixed buttons in the about dialog not working
+
+Version 2.0.1
+-------------
+* Fixed major issue causing default items to be displayed instead of loaded items
+* Fixed item set spacing at large resolutions
+
+Version 2.0.0
+-------------
+* Completely redesigned user interface
+* Added new "simple" filter interface (replicates in-game shop)
+* Added customizable backgrounds (add custom backgrounds by putting images into the "Backgrounds" folder)
+* Added champion icons to the champion selection combo box
+* Remade tooltips
+* Fixed tooltip size fixing not always working
+* Minor bug fixes to improve stability
+
+
+Version 1.5.0
+-------------
+* Added custom URI support with the format: eric://*champion key*/*24-digit item set code* (ex. eric://Caitlyn/100110011001100110011001 for Caitlyn with all boots)
+* Added fancy menu icons
+* Added menu option to check for cache updates
+* Disabled dialog on successful automatic cache updates
+* Fixed updater not working
+
+Version 1.4.8
+-------------
+* Added possible support for the Boompje and iLoL Mac clients (needs testing that I can't do)
+* Made augment upgrades only visible when Viktor is in focus
+* Fixed bug that caused saving to fail
+* Fixed other minor bugs
+
+Version 1.4.7
+-------------
+* Re-added item set import and export with import set selection disabled
+* Fixed a number of small bugs
+
+Version 1.4.6
+-------------
+* Added ability to set favorite champions (show up on the top of the combo box)
+* Added indication of which item set is currently being used by the game.
+* Item container separation is based off item size instead of being static
+* Removed dependency on internally stored item images
+* Fixed major problems with the item set combo box by cleaning-up and reworking the item set code
+* Fixed major saving problems with multiple item sets
+* Fixed some champion images not showing up
+* Fixed minor bugs with default items
+* Increased debug logging depth
+* Item set import and export has been disabled due to a number of large issues (will be fixed soon)
+
+Version 1.4.5
+-------------
+* Added build menu with functions for saving, clearing the build, and resetting the build
+* Added default items
+* Fixed a bug that caused the previous version to not update
+* Fixed a problem with cache updating
+* Fixed external links going to the old website
+* Minor bug fixes
+
+Version 1.4.4
+-------------
+* Added new champion, Shyvana
+* Added framework for faster champion updates
+* Increased logging depth
+* Minor bug fixes
+
+Version 1.4.3
+-------------
+* Fixed a bug that caused a failure in saving
+* Added confirmation of saving
+
+Version 1.4.2
+-------------
+* Added new champion, Graves
+* Added option to use a fixed tool-tip width (credit to DoogTheMushroom)
+* Finished help menu items
+
+Version 1.4.1
+-------------
+* Updated updater to version 1.1 (fixes issues when not an administrator)
+* Fixed program not starting after a successful update
+* Reduced program size by 31.625%
+
+Version 1.4.0
+-------------
+* Added new champion, Xerath
+* Added ability to export and import all builds
+* Added compatibility with item codes from other item changers
+* Added option to change item image size
+* Added additional interface components for existing options
+* Added toolbar for future function expansion
+* Improved overall stability, mostly relating to item sets
+* Improved LoL folder search system
+* Made the updater cancel button actually do something
+
+Version 1.3.3
+-------------
+* Added new updater, now automatically downloads and patches files
+* Improved LoL folder search system
+* Fixed images for Prospector items
+
+Version 1.3.2
+-------------
+* Added support for multiple item sets
+* Fixed incorrect Dominion item IDs
+* Fixed showing of Dominion items by default
+
+Version 1.3.1
+-------------
+* Added Dominion mode items
+
+Version 1.3.0
+-------------
+* Added item tool-tips (thanks to xMoko and doubledog for data mining)
+* Added Riven
+* Added missing champions (Skarner, Talon)
+* Items are now displayed in alphabetical order
+* Made small modifications to interface
+
+Version 1.2.2
+-------------
+* Added drag-and-drop between recommended items
+* Added minor support for South-East Asia clients
+* Added native launcher for ease of use
+* Cleaned up interface
+* Fixed minor bugs
+
+Version 1.2.1
+-------------
+* Fixed major bug concerning startup failure
+* Improved LoL folder searching
+
+Version 1.2.0
+-------------
+* Added option to remove item configuration file for a champion when resetting
+* Added options
+* Added version checking on startup
+* Added support to manually change the LoL directory
+* Fixed improper sorting of champions in the drop-down menu
+* Fixed proper saving of Dominion mode items
+* Fixed a problem with the enabling/disabling of the save button
+* Fixed other small bugs
+
+Version 1.1.0
+-------------
+* Small bug fixes
+
+Version 1.0.0
+-------------
+* Release
