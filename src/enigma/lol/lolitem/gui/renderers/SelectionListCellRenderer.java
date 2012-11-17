@@ -8,7 +8,7 @@ import enigma.paradoxion.util.*;
 
 public class SelectionListCellRenderer<E> extends AbstractStripedListCellRenderer<E>
 {
-	private JLabel label;
+	private JPanel panel;
 	
 	private int selectedIndex = -1;
 	private String selectionText;
@@ -17,12 +17,12 @@ public class SelectionListCellRenderer<E> extends AbstractStripedListCellRendere
 	{
 		selectionText = sT;
 		
-		setLayout(new BorderLayout());
+		panel = new JPanel();
+		panel.setLayout(new BorderLayout());
 		
-		label = new JLabel();
-		label.setHorizontalAlignment(JLabel.LEADING);
-		label.setVerticalAlignment(JLabel.CENTER);
-		add(label, BorderLayout.CENTER);
+		setHorizontalAlignment(JLabel.LEADING);
+		setVerticalAlignment(JLabel.CENTER);
+		panel.add(this, BorderLayout.CENTER);
 	}
 	
 	@Override
@@ -32,9 +32,8 @@ public class SelectionListCellRenderer<E> extends AbstractStripedListCellRendere
 		
 		boolean selected = index == selectedIndex;
 		ImageIcon icon = ResourceLoader.getImageIcon(selected ? "selected.png" : "not_selected.png");
-		label.setIcon(icon);
-		label.setText(value+(selected ? " ("+selectionText+")" : ""));
-		setFont(list.getFont());
+		setIcon(icon);
+		setText(value+(selected ? " ("+selectionText+")" : ""));
 		
 		return this;
 	}

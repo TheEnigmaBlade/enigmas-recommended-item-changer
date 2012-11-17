@@ -18,7 +18,7 @@ import enigma.lol.lolitem.data.filter.*;
 import enigma.lol.lolitem.gui.models.*;
 import enigma.lol.lolitem.gui.renderers.*;
 
-public class ChampionComboBox extends ComponentComboBox
+public class ChampionComboBox extends ComponentComboBox<String>
 {
 	private FocusTextField championsFilterField;
 	private JCheckBox assassinCheckBox, carryCheckBox, fighterCheckBox, mageCheckBox, tankCheckBox, supportCheckBox;

@@ -47,7 +47,7 @@ public class LoLItems extends JFrame implements DragGestureListener
 {
 	public static final String appName = "Enigma's Recommended Item Changer";
 	public static final String appKey = "EnigmaItem";
-	public static final String version = "2.3.2", buildVersion = "1", versionAdd = "";
+	public static final String version = "2.3.3", buildVersion = "2", versionAdd = "";
 	
 	//GUI
 	private BackgroundPanel backgroundPanel;
@@ -64,8 +64,8 @@ public class LoLItems extends JFrame implements DragGestureListener
 	private DraggableItemContainer draggableItemGridPanel, draggableItemListPanel;
 	private DraggableItemContainerModel draggableItemModel;
 	private JLabel itemSetsLabel;
-	private JComboBox itemSetComboBox;
-	private SelectionListCellRenderer itemSetRenderer;
+	private JComboBox<String> itemSetComboBox;
+	private SelectionListCellRenderer<String> itemSetRenderer;
 	private JButton itemSetAddButton, itemSetRemoveButton;
 	private SaveButton saveButton;
 	private ResetButton resetButton;
@@ -1288,7 +1288,7 @@ public class LoLItems extends JFrame implements DragGestureListener
 		
 		TranslucentPanel championPanel = new TranslucentPanel(175);
 		translucentPanels.add(championPanel);
-		championPanel.setBorder(new CompoundBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "", TitledBorder.LEADING, TitledBorder.TOP, null, null), new EmptyBorder(2, 3, 2, 3)));
+		championPanel.setBorder(new CompoundBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null), new EmptyBorder(2, 3, 2, 3)));
 		championPanel.setPreferredSize(new Dimension(225, 98));
 		sidePanel.add(championPanel, BorderLayout.NORTH);
 		GridBagLayout gbl_championPanel = new GridBagLayout();
@@ -1363,7 +1363,7 @@ public class LoLItems extends JFrame implements DragGestureListener
 		championComboBox.setOpaque(false);
 		
 		gameModeComboBox = new GameModeComboBox();
-		DefaultComboBoxModel model = new DefaultComboBoxModel();
+		DefaultComboBoxModel<GameMode> model = new DefaultComboBoxModel<GameMode>();
 		for(GameMode mode : GameMode.values())
 			model.addElement(mode);
 		gameModeComboBox.setModel(model);
@@ -2084,7 +2084,7 @@ public class LoLItems extends JFrame implements DragGestureListener
 		translucentPanels.add(itemsPanel);
 		itemsPanel.setOpaque(false);
 		itemsPanel.setPreferredSize(new Dimension(0, 98));
-		itemsPanel.setBorder(new CompoundBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "", TitledBorder.LEADING, TitledBorder.TOP, null, null), new EmptyBorder(0, 2, 1, 2)));
+		itemsPanel.setBorder(new CompoundBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null), new EmptyBorder(0, 2, 1, 2)));
 		mainPanel.add(itemsPanel, BorderLayout.NORTH);
 		itemsPanel.setLayout(new BorderLayout(0, 2));
 		
@@ -2185,10 +2185,10 @@ public class LoLItems extends JFrame implements DragGestureListener
 		itemSetsLabel = new JLabel("Item Sets:");
 		itemSetsPanel.add(itemSetsLabel, BorderLayout.WEST);
 		
-		itemSetComboBox = new JComboBox();
+		itemSetComboBox = new JComboBox<String>();
 		itemSetComboBox.setPreferredSize(new Dimension(0, 22));
-		itemSetComboBox.setModel(new DefaultComboBoxModel(new String[]{noChampionText}));
-		itemSetRenderer = new SelectionListCellRenderer("Current");
+		itemSetComboBox.setModel(new DefaultComboBoxModel<String>(new String[]{noChampionText}));
+		itemSetRenderer = new SelectionListCellRenderer<String>("Current");
 		itemSetComboBox.setRenderer(itemSetRenderer);
 		itemSetComboBox.setMaximumRowCount(8);
 		itemSetComboBox.addItemListener(new ItemListener(){
@@ -2981,7 +2981,7 @@ public class LoLItems extends JFrame implements DragGestureListener
 		writeToLog("Changing champion item set");
 		disableComboBoxUpdate.set(true);
 		
-		((DefaultComboBoxModel)itemSetComboBox.getModel()).removeAllElements();
+		((DefaultComboBoxModel<String>)itemSetComboBox.getModel()).removeAllElements();
 		
 		if(currentChampion !=  null)
 		{
@@ -3510,7 +3510,7 @@ public class LoLItems extends JFrame implements DragGestureListener
 				{
 					lolDirRegion = "sea";
 				}
-				else if(key.equals("region"))
+				else if(key.equals("lolregion"))
 				{
 					lolDirRegion = value;
 				}
@@ -3600,12 +3600,12 @@ public class LoLItems extends JFrame implements DragGestureListener
 					String[] setStrings = value.split(";");
 					for(String setString : setStrings)
 					{
-						String name = setString.substring(0, setString.indexOf(':'));
+						//String name = setString.substring(0, setString.indexOf(':'));
 						String[] itemStrings = setString.substring(setString.indexOf(':'+1)).split(",");
-						ItemSet set = new ItemSet(name);
+						//ItemSet set = new ItemSet(name);
 						for(int n = 0; n < itemStrings.length; n++)
 						{
-							
+							//TODO
 						}
 					}
 				}

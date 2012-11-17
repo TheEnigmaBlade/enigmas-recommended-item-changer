@@ -1,6 +1,7 @@
 package enigma.lol.lolitem.gui.components;
 
 import java.awt.*;
+import java.awt.event.*;
 import javax.swing.*;
 import enigma.paradoxion.localization.*;
 
@@ -42,17 +43,17 @@ public class SaveButton extends JButton
 			setForeground(failureColor);
 		}
 		
-		SwingUtilities.invokeLater(new Thread(){
-			public void run()
+		new Timer(1500, new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent evt)
 			{
-				try
-				{
-					sleep(1500);
-				}
-				catch(InterruptedException e){}
-				
-				setText(saveButtonTextBase);
-				setForeground(baseColor);
+				SwingUtilities.invokeLater(new Thread(){
+					public void run()
+					{
+						setText(saveButtonTextBase);
+						setForeground(baseColor);
+					}
+				});
 			}
 		});
 	}

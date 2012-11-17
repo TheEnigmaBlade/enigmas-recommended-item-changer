@@ -50,6 +50,7 @@ public class UpdateUtil
 								waitForClose = false;
 							}
 						}
+						System.out.println("After update while");
 						scanner.close();
 					}
 					catch(Exception e)

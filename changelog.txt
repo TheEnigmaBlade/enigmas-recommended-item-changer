@@ -1,4 +1,10 @@
-Version 2.3.1
+Version 2.3.3
+-------------
+* Fixed a number of issues causing startup crashes on SEA clients
+* Fixed a number of start-up issues when launching for the first time
+* Fixed an incorrect updater dialog in the case of a successful update
+
+Version 2.3.2
 -------------
 * Added support for the new Twisted Treeline mode and items
 * Changed default recommended items to load from the client databases if possible

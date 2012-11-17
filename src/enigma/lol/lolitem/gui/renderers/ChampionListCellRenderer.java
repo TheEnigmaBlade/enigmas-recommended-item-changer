@@ -15,7 +15,9 @@ import enigma.lol.lollib.io.*;
 
 public class ChampionListCellRenderer extends AbstractStripedListCellRenderer<String>
 {
-	private JLabel imageLabel, textLabel;
+	private JPanel panel;
+	
+	private JLabel imageLabel;
 	private boolean showSelected;
 	
 	private String selectChampionText = "Select Champion";
@@ -38,15 +40,16 @@ public class ChampionListCellRenderer extends AbstractStripedListCellRenderer<St
 	{
 		this.showSelected = showSelected;
 		
-		setLayout(new BorderLayout(2, 0));
-		setBorder(new EmptyBorder(2, 2, 2, 2));
+		panel = new JPanel();
+		panel.setLayout(new BorderLayout(2, 0));
+		panel.setBorder(new EmptyBorder(2, 2, 2, 2));
+		panel.setOpaque(false);
 		
 		imageLabel = new JLabel();
 		imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		add(imageLabel, BorderLayout.WEST);
+		panel.add(imageLabel, BorderLayout.WEST);
 		
-		textLabel = new JLabel();
-		add(textLabel, BorderLayout.CENTER);
+		panel.add(this, BorderLayout.CENTER);
 	}
 	
 	@Override
@@ -70,35 +73,34 @@ public class ChampionListCellRenderer extends AbstractStripedListCellRenderer<St
 			//Text
 		if(index == -1 && (!showSelected || champion.startsWith("---")))
 		{
-			textLabel.setText(selectChampionText);
-			textLabel.setEnabled(false);
+			setText(selectChampionText);
+			setEnabled(false);
 		}
 		else
 		{
-			textLabel.setText(champion);
-			textLabel.setEnabled(true);
+			setText(champion);
+			setBorder(new EmptyBorder(0, 2, 0, 0));
+			setEnabled(true);
 		}
-		
-		textLabel.setFont(list.getFont());
-		
+			
 			//Images and layout
 		if(index != -1 && isChampion)
 		{
-			((BorderLayout)getLayout()).setHgap(4);
+			((BorderLayout)panel.getLayout()).setHgap(4);
 			
 			Icon championIcon = imageCache.get(ChampionDatabase.getChampionKey(champion));
 			imageLabel.setIcon(championIcon);
-			textLabel.setHorizontalAlignment(SwingConstants.LEFT);
+			setHorizontalAlignment(SwingConstants.LEFT);
 		}
 		else
 		{
-			((BorderLayout)getLayout()).setHgap(0);
+			((BorderLayout)panel.getLayout()).setHgap(0);
 			
 			imageLabel.setIcon(null);
-			textLabel.setHorizontalAlignment(SwingConstants.CENTER);
+			setHorizontalAlignment(SwingConstants.CENTER);
 		}
 		
-		return this;
+		return panel;
 	}
 	
 	private static Component getBlankComponent()

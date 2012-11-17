@@ -8,18 +8,17 @@ import enigma.paradoxion.ui.renderers.*;
 
 public class BuildListCellRenderer extends AbstractStripedListCellRenderer<String>
 {
-	private JLabel textLabel;
+	private JPanel panel;
 	
 	private String noBuildsText = "No existing builds", selectBuildText = "Select build";
 		
 	public BuildListCellRenderer()
 	{
-		setLayout(new BorderLayout(2, 0));
-		setBorder(new EmptyBorder(2, 2, 2, 2));
-			
-		textLabel = new JLabel();
-		textLabel.setFont(getFont());
-		add(textLabel, BorderLayout.CENTER);
+		panel = new JPanel();
+		panel.setLayout(new BorderLayout(2, 0));
+		panel.setBorder(new EmptyBorder(2, 2, 2, 2));
+		
+		panel.add(this, BorderLayout.CENTER);
 	}
 	
 	@Override
@@ -37,25 +36,25 @@ public class BuildListCellRenderer extends AbstractStripedListCellRenderer<Strin
 		if(build.startsWith("---"))
 		{
 			String key = build.substring(3);
-			textLabel.setText(key.equals("empty") ? noBuildsText : key.equals("select") ? selectBuildText : "");
-			textLabel.setEnabled(false);
+			setText(key.equals("empty") ? noBuildsText : key.equals("select") ? selectBuildText : "");
+			setEnabled(false);
 		}
 		else
 		{
-			textLabel.setText(build);
-			textLabel.setEnabled(true);
+			setText(build);
+			setEnabled(true);
 		}
 		
 			//Layout
 		if(index != -1)
 		{
-			((BorderLayout)getLayout()).setHgap(4);
-			textLabel.setHorizontalAlignment(SwingConstants.LEFT);
+			((BorderLayout)panel.getLayout()).setHgap(4);
+			setHorizontalAlignment(SwingConstants.LEFT);
 		}
 		else
 		{
-			((BorderLayout)getLayout()).setHgap(0);
-			textLabel.setHorizontalAlignment(SwingConstants.CENTER);
+			((BorderLayout)panel.getLayout()).setHgap(0);
+			setHorizontalAlignment(SwingConstants.CENTER);
 		}
 		
 		return this;

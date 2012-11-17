@@ -4,10 +4,11 @@ import java.awt.*;
 import javax.swing.*;
 
 import enigma.paradoxion.ui.components.*;
+import enigma.lol.lollib.data.*;
 
 import enigma.lol.lolitem.gui.renderers.*;
 
-public class GameModeComboBox extends ComponentComboBox
+public class GameModeComboBox extends ComponentComboBox<GameMode>
 {
 	private GameModeListCellRenderer renderer;
 	

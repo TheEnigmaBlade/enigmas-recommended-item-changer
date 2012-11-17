@@ -8,26 +8,28 @@ import enigma.paradoxion.ui.renderers.*;
 
 import enigma.lol.lollib.data.*;
 
-@SuppressWarnings("rawtypes")
-public class GameModeListCellRenderer extends AbstractStripedListCellRenderer
+public class GameModeListCellRenderer extends AbstractStripedListCellRenderer<GameMode>
 {
-	private JLabel imageLabel, textLabel;
+	private JPanel panel;
+	private JLabel imageLabel;
 	
 	public GameModeListCellRenderer()
 	{
-		setLayout(new BorderLayout(0, 0));
 		setBorder(new EmptyBorder(2, 2, 2, 2));
+		
+		panel = new JPanel();
+		panel.setLayout(new BorderLayout(0, 0));
+		panel.setOpaque(false);
 		
 		imageLabel = new JLabel();
 		imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		add(imageLabel, BorderLayout.WEST);
+		panel.add(imageLabel, BorderLayout.WEST);
 		
-		textLabel = new JLabel();
-		add(textLabel, BorderLayout.CENTER);
+		panel.add(this, BorderLayout.CENTER);
 	}
 	
 	@Override
-	public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus)
+	public Component getListCellRendererComponent(JList<? extends GameMode> list, GameMode value, int index, boolean isSelected, boolean cellHasFocus)
 	{
 		super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 		
@@ -36,25 +38,25 @@ public class GameModeListCellRenderer extends AbstractStripedListCellRenderer
 			GameMode mode = (GameMode)value;
 			if(index == -1)
 			{
-				textLabel.setText(mode.getTitle()+" Mode");
-				textLabel.setHorizontalAlignment(SwingConstants.CENTER);
+				setText(mode.getTitle()+" Mode");
+				setHorizontalAlignment(SwingConstants.CENTER);
 			}
 			else
 			{
-				textLabel.setText(mode.getTitle()+" ("+mode.getDetails()+")");
-				textLabel.setHorizontalAlignment(SwingConstants.LEFT);
+				setText(mode.getTitle()+" ("+mode.getDetails()+")");
+				setHorizontalAlignment(SwingConstants.LEFT);
 			}
 		}
 		else
 		{
-			textLabel.setText("");
-			textLabel.setHorizontalAlignment(SwingConstants.LEFT);
+			setText("");
+			setHorizontalAlignment(SwingConstants.LEFT);
 		}
 		
 		if(list != null)
-			textLabel.setFont(list.getFont());
+			setFont(list.getFont());
 		
-		return this;
+		return panel;
 	}
 	
 	public void reloadText()
