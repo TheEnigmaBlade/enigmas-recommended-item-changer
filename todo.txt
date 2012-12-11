@@ -1,11 +1,2 @@
--Item sorting
--Build comments
--Move update finish to main file
-
-System.setProperty("apple.laf.useScreenMenuBar", "true");
-System.setProperty("com.apple.mrj.application.apple.menu.about.name", "LoL Custom Builds");
-
-FIXME:
-- XML saving uses wrong item mode value
-	outputs: <gamemode mode="Summoner's Rift, The Twisted Treeline">
-	rather than :<gamemode mode="CLASSIC">
+Bugs:
+-Add way to go back from component filters

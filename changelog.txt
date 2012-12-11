@@ -1,3 +1,12 @@
+Version 3.0.1
+-------------
+* A number of fixes for startup crashes
+
+Version 3.0.0
+-------------
+* Support for the new shop and recommended items
+* Brand new interface!
+
 Version 2.3.3
 -------------
 * Fixed a number of issues causing startup crashes on SEA clients

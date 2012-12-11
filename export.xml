@@ -28,12 +28,14 @@
 				<attribute name="Built-By" value="Enigma" />
 				<attribute name="Implementation-Version" value="${version}.${build}" />
 				<attribute name="Built-Date" value="${date}" />
-				<attribute name="Main-Class" value="enigma.lol.lolitem.LoLItemsMain" />
+				<attribute name="Main-Class" value="net.enigmablade.lol.lolitem.EnigmaItemsMain" />
 				<attribute name="SplashScreen-Image" value="resources/images/splash.png" />
 			</manifest>
-			<fileset dir="bin" excludes="resources/installer/**" />
+			<fileset dir="bin" excludes="net/enigmablade/lol/lolitem/test/**" />
 			<zipfileset src="lib/LoLLib.jar" excludes="META-INF/**" />
+			<zipfileset src="lib/swingx.jar" excludes="META-INF/**" />
 			<zipfileset src="lib/sqlitejdbc.jar" excludes="META-INF/**" />
+			<zipfileset src="lib/json-simple.jar" excludes="META-INF/**" />
 		</jar>
 		
 		<jar destfile="export/jar/URL_Installer.jar">
@@ -43,7 +45,7 @@
 				<attribute name="Built-Date" value="${date}" />
 				<attribute name="Main-Class" value="enigma.lol.installer.BasicInstallerMain" />
 			</manifest>
-			<fileset dir="bin" includes="enigma/lol/installer/BasicInstallerMain.class,enigma/lol/installer/ProtocolInstaller.class,enigma/lol/installer/util/WinRegistry.class" />
+			<fileset dir="bin" includes="net/enigmablade/lol/installer/BasicInstallerMain.class,net/enigmablade/lol/installer/ProtocolInstaller.class,net/enigmablade/lol/installer/util/WinRegistry.class" />
 		</jar>
 		
 	</target>
@@ -57,7 +59,7 @@
 			  <jar>..\export\jar\${jar_name}.jar</jar>
 			  <outfile>..\export\Enigma Item Changer.exe</outfile>
 			  <errTitle></errTitle>
-			  <cmdLine></cmdLine>
+			  <cmdLine>-debug</cmdLine>
 			  <chdir></chdir>
 			  <priority>normal</priority>
 			  <downloadUrl>http://www.oracle.com/technetwork/java/javase/downloads/java-se-jre-7-download-432155.html</downloadUrl>
@@ -125,14 +127,14 @@
 		
 		<taskdef name="launch4j" classname="net.sf.launch4j.ant.Launch4jTask" classpath="${launch4j_dir}/launch4j.jar:${launch4j_dir}/lib/xstream.jar" />
 		<launch4j configFile="launch4j/launch4jconfig.xml" />
-		<launch4j configFile="launch4j/launch4jconfig_basicinstaller.xml" />
+		<!--<launch4j configFile="launch4j/launch4jconfig_basicinstaller.xml" />-->
 	</target>
 	
 	<!-- Create distribution archives -->
 	<target name="create_zip">
 		<mkdir dir="export/dist" />
 		
-		<copy file="changelog.txt" todir="export" />
+		<!--<copy file="changelog.txt" todir="export" />-->
 		<copy file="license.txt" todir="export"	/>
 		<copy file="cache.dat" todir="export" />
 		<copy file="Updater.exe" todir="export" />
@@ -198,12 +200,12 @@
 		<copy file="export/dist/${dist_name}_${version}.zip" todir="${dropbox_release}" />
 		<!--<copy file="export/dist/${dist_name}_${version}_installer.exe" todir="${dropbox_release}" />-->
 		
-		<ftp server="${ftp.server}" userid="${ftp.user}" password="${ftp.password}" remotedir="${ftp.dir}/downloads/lol-item-changer" binary="yes" verbose="true" passive="yes" >
+		<!--<ftp server="${ftp.server}" userid="${ftp.user}" password="${ftp.password}" remotedir="${ftp.dir}/downloads/lol-item-changer" binary="yes" verbose="true" passive="yes" >
 			<fileset dir="export/dist/">
-				<include name="${dist_name}_${version}.zip" />
+				<include name="${dist_name}_${version}.zip" />-->
 				<!--<include name="${dist_name}_${version}_installer.zip" />-->
-			</fileset>
-		</ftp>
+			<!--</fileset>
+		</ftp>-->
 	</target>
 	
 	<target name="distribute_update">
@@ -213,12 +215,12 @@
 		<copy file="export/dist/update_package.zip" todir="${dropbox_update}" />
 		<copy file="changelog.txt" todir="${dropbox_release}" />
 		
-		<ftp server="${ftp.server}" userid="${ftp.user}" password="${ftp.password}" remotedir="${ftp.dir}/updates/EnigmaItem" binary="yes" verbose="true" passive="yes" >
+		<!--<ftp server="${ftp.server}" userid="${ftp.user}" password="${ftp.password}" remotedir="${ftp.dir}/updates/EnigmaItem" binary="yes" verbose="true" passive="yes" >
 			<fileset dir="export/dist/">
 				<include name="version.txt" />
 				<include name="update_package.zip" />
 			</fileset>
-		</ftp>
+		</ftp>-->
 	</target>
 	
 	<!-- Create source distribution archive -->
