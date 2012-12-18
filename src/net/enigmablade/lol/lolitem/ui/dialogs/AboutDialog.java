@@ -5,12 +5,14 @@ import java.awt.event.*;
 import java.awt.geom.*;
 import javax.swing.*;
 import javax.swing.border.*;
+
 import net.enigmablade.paradoxion.localization.*;
 import net.enigmablade.paradoxion.ui.*;
 import net.enigmablade.paradoxion.util.*;
-import net.enigmablade.lol.lolitem.*;
-import net.enigmablade.lol.lolitem.ui.components.pretty.*;
 
+import net.enigmablade.lol.lollib.ui.pretty.*;
+
+import net.enigmablade.lol.lolitem.*;
 
 public class AboutDialog extends JDialog
 {

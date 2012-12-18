@@ -6,13 +6,15 @@ import java.awt.dnd.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
+
 import net.enigmablade.paradoxion.ui.components.translucent.*;
-import net.enigmablade.lol.lolitem.ui.components.pretty.*;
+
+import net.enigmablade.lol.lollib.ui.pretty.*;
+
 import net.enigmablade.lol.lolitem.ui.dnd.*;
 import net.enigmablade.lol.lolitem.ui.models.*;
 
 import static net.enigmablade.paradoxion.util.Logger.*;
-
 
 public abstract class DraggableItemContainer extends TranslucentPanel
 {
@@ -85,7 +87,6 @@ public abstract class DraggableItemContainer extends TranslucentPanel
 		
 		if(showReturn)
 		{
-			System.out.println("Adding return panel");
 			returnPanel.setPreferredSize(new Dimension(getWidth(), 30));
 			returnPanel.setSize(new Dimension(getWidth(), 30));
 			add(returnPanel);
@@ -107,7 +108,6 @@ public abstract class DraggableItemContainer extends TranslucentPanel
 	
 	public void setReturnShown(boolean show)
 	{
-		System.out.println("Setting show return: "+show);
 		showReturn = show;
 		updateContents(enabled);
 	}

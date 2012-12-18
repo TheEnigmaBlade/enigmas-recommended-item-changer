@@ -3,8 +3,10 @@ package net.enigmablade.lol.lolitem.ui.components;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+
 import net.enigmablade.paradoxion.localization.*;
-import net.enigmablade.lol.lolitem.ui.components.pretty.*;
+
+import net.enigmablade.lol.lollib.ui.pretty.*;
 
 
 public class SaveButton extends PrettyButton

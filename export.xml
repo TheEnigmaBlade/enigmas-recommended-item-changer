@@ -33,7 +33,6 @@
 			</manifest>
 			<fileset dir="bin" excludes="net/enigmablade/lol/lolitem/test/**" />
 			<zipfileset src="lib/LoLLib.jar" excludes="META-INF/**" />
-			<zipfileset src="lib/swingx.jar" excludes="META-INF/**" />
 			<zipfileset src="lib/sqlitejdbc.jar" excludes="META-INF/**" />
 			<zipfileset src="lib/json-simple.jar" excludes="META-INF/**" />
 		</jar>
@@ -136,6 +135,7 @@
 		
 		<!--<copy file="changelog.txt" todir="export" />-->
 		<copy file="license.txt" todir="export"	/>
+		<copy file="changelog.txt" todir="export" />
 		<copy file="cache.dat" todir="export" />
 		<copy file="Updater.exe" todir="export" />
 		
@@ -200,12 +200,12 @@
 		<copy file="export/dist/${dist_name}_${version}.zip" todir="${dropbox_release}" />
 		<!--<copy file="export/dist/${dist_name}_${version}_installer.exe" todir="${dropbox_release}" />-->
 		
-		<!--<ftp server="${ftp.server}" userid="${ftp.user}" password="${ftp.password}" remotedir="${ftp.dir}/downloads/lol-item-changer" binary="yes" verbose="true" passive="yes" >
+		<ftp server="${ftp.server}" userid="${ftp.user}" password="${ftp.password}" remotedir="${ftp.dir}/downloads/lol-item-changer" binary="yes" verbose="true" passive="yes" >
 			<fileset dir="export/dist/">
-				<include name="${dist_name}_${version}.zip" />-->
+				<include name="${dist_name}_${version}.zip" />
 				<!--<include name="${dist_name}_${version}_installer.zip" />-->
-			<!--</fileset>
-		</ftp>-->
+			</fileset>
+		</ftp>
 	</target>
 	
 	<target name="distribute_update">
@@ -215,12 +215,12 @@
 		<copy file="export/dist/update_package.zip" todir="${dropbox_update}" />
 		<copy file="changelog.txt" todir="${dropbox_release}" />
 		
-		<!--<ftp server="${ftp.server}" userid="${ftp.user}" password="${ftp.password}" remotedir="${ftp.dir}/updates/EnigmaItem" binary="yes" verbose="true" passive="yes" >
+		<ftp server="${ftp.server}" userid="${ftp.user}" password="${ftp.password}" remotedir="${ftp.dir}/updates/EnigmaItem" binary="yes" verbose="true" passive="yes" >
 			<fileset dir="export/dist/">
 				<include name="version.txt" />
 				<include name="update_package.zip" />
 			</fileset>
-		</ftp>-->
+		</ftp>
 	</target>
 	
 	<!-- Create source distribution archive -->

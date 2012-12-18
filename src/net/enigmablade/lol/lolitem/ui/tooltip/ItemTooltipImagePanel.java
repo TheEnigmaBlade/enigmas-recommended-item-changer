@@ -42,8 +42,14 @@ public class ItemTooltipImagePanel extends JPanel
 	{
 		image = null;
 		if(name != null)
+		{
 			image = GamePathUtil.getItemImage(name);
-		if(name != null && image == null)
+			if(image == null)
+				ResourceLoader.getImage("missing_items/"+name+".png");
+		}
+		if(image == null)
+			image = GamePathUtil.getItemImage("EmptyIcon");
+		if(image == null)
 			image = ResourceLoader.getImage("null.png");
 		
 		if(image != null)

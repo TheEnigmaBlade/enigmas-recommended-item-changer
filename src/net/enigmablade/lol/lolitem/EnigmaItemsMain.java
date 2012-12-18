@@ -1,14 +1,14 @@
 package net.enigmablade.lol.lolitem;
 
 import javax.swing.*;
+
 import net.enigmablade.paradoxion.io.*;
 import net.enigmablade.paradoxion.util.*;
-import net.enigmablade.lol.lolitem.ui.*;
+
 import net.enigmablade.lol.lollib.data.*;
+import net.enigmablade.lol.lollib.ui.*;
 
 import static net.enigmablade.paradoxion.util.Logger.*;
-
-
 
 public class EnigmaItemsMain
 {

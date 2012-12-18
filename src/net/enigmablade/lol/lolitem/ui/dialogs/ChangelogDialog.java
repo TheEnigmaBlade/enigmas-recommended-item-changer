@@ -6,9 +6,10 @@ import java.io.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;
-import net.enigmablade.paradoxion.localization.*;
-import net.enigmablade.lol.lolitem.ui.components.pretty.*;
 
+import net.enigmablade.paradoxion.localization.*;
+
+import net.enigmablade.lol.lollib.ui.pretty.*;
 
 public class ChangelogDialog extends JDialog
 {

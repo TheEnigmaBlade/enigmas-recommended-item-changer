@@ -7,18 +7,20 @@ import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
 import javax.swing.text.*;
+
 import net.enigmablade.paradoxion.localization.*;
 import net.enigmablade.paradoxion.ui.components.*;
-import net.enigmablade.lol.lolitem.data.filter.*;
-import net.enigmablade.lol.lolitem.ui.*;
-import net.enigmablade.lol.lolitem.ui.components.pretty.*;
-import net.enigmablade.lol.lolitem.ui.models.*;
-import net.enigmablade.lol.lolitem.ui.renderers.*;
+
 import net.enigmablade.lol.lollib.data.*;
+import net.enigmablade.lol.lollib.ui.*;
+import net.enigmablade.lol.lollib.ui.pretty.*;
+import net.enigmablade.lol.lollib.ui.renderers.*;
+
+import net.enigmablade.lol.lolitem.data.filter.*;
+import net.enigmablade.lol.lolitem.ui.models.*;
+
 
 import static net.enigmablade.paradoxion.util.Logger.*;
-
-
 
 public class ChampionComboBox extends PrettyComboBox<String>
 {

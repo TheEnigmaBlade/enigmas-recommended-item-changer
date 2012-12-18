@@ -2,20 +2,22 @@ package net.enigmablade.lol.lolitem.ui.components;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.List;
 import javax.swing.*;
 import javax.swing.border.*;
-import net.enigmablade.lol.lolitem.data.*;
-import net.enigmablade.lol.lolitem.data.filter.*;
-import net.enigmablade.lol.lolitem.ui.*;
-import net.enigmablade.lol.lolitem.ui.components.items.*;
-import net.enigmablade.lol.lolitem.ui.components.pretty.*;
-import net.enigmablade.lol.lollib.data.*;
 import org.jdesktop.swingx.*;
+
 import net.enigmablade.paradoxion.ui.components.*;
 
+import net.enigmablade.lol.lollib.ui.*;
+import net.enigmablade.lol.lollib.ui.pretty.*;
+import net.enigmablade.lol.lollib.data.*;
+
+import net.enigmablade.lol.lolitem.data.*;
+import net.enigmablade.lol.lolitem.data.filter.*;
+import net.enigmablade.lol.lolitem.ui.components.items.*;
+
 import static net.enigmablade.paradoxion.util.Logger.*;
-
-
 
 public class ItemGroupPanel 
 {
@@ -67,6 +69,7 @@ public class ItemGroupPanel
 		tabPanel.setLayout(new BorderLayout(4, 0));
 		
 		nameLabel = new EditableLabel("");
+		nameLabel.setCaretColor(UIUtil.FOREGROUND);
 		tabPanel.add(nameLabel, BorderLayout.CENTER);
 		
 		collapseButton = new PrettyButton();
@@ -158,16 +161,20 @@ public class ItemGroupPanel
 	
 	public void setItems(ItemGroup set)
 	{
-		for(Item i : set.getItems())
+		List<Item> items = set.getItems();
+		List<Integer> itemCounts = set.getItemCounts();
+		for(int n = 0; n < items.size(); n++)
 		{
-			writeToLog(i+"", 3);
-			content.addItem(i);
+			Item i = items.get(n);
+			int count = itemCounts.get(n);
+			writeToLog(i+" ("+count+")", 3);
+			content.addItem(i, count);
 		}
 	}
 	
 	public ItemGroup getItems()
 	{
-		return new ItemGroup(nameLabel.getText(), content.getItems());
+		return new ItemGroup(nameLabel.getText(), content.getItems(), content.getItemCounts());
 	}
 	
 	public void refreshPanel()

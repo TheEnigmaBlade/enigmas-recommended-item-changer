@@ -5,9 +5,10 @@ import java.awt.event.*;
 import java.util.*;
 import java.util.List;
 import javax.swing.*;
-import net.enigmablade.lol.lolitem.ui.components.items.*;
-import net.enigmablade.lol.lolitem.ui.components.pretty.*;
 
+import net.enigmablade.lol.lollib.ui.pretty.*;
+
+import net.enigmablade.lol.lolitem.ui.components.items.*;
 
 public class ItemGroupListPanel extends JPanel
 {
@@ -15,12 +16,17 @@ public class ItemGroupListPanel extends JPanel
 	private ActionListener removeListener;
 	
 	private JButton addGroupButton;
+	private ItemGroupComboBox addDefaultGroupButton;
 	private JPanel spacer;
 	
 	private List<ItemGroupPanel> groupPanels;
 	
+	
 	public ItemGroupListPanel()
 	{
+		initComponents();
+	}
+	private void initComponents() {
 		listener = new ComponentAdapter(){
 			@Override
 			public void componentResized(ComponentEvent evt)
@@ -29,8 +35,15 @@ public class ItemGroupListPanel extends JPanel
 			}
 		};
 		
+		setLayout(new FlowLayout(FlowLayout.CENTER, 0, 5));
+		
 		addGroupButton = new PrettyButton("Add Group");
 		add(addGroupButton);
+		
+		addDefaultGroupButton = new ItemGroupComboBox();
+		addDefaultGroupButton.setBorder(null);
+		addDefaultGroupButton.setPreferredSize(new Dimension(18, 22));
+		//add(addDefaultGroupButton);
 		
 		spacer = new JPanel();
 		spacer.setOpaque(true);
@@ -54,7 +67,7 @@ public class ItemGroupListPanel extends JPanel
 			Component c = cs[n];
 			c.setSize(getWidth()-10, c.getPreferredSize().height);
 			c.setPreferredSize(new Dimension(getWidth()-10, c.getPreferredSize().height));
-			add(c, getComponentCount()-2);
+			add(c, getComponentCount()-/*3*/2);
 		}
 		group.addComponentListener(listener);
 		group.addRemoveListener(removeListener);
@@ -97,6 +110,7 @@ public class ItemGroupListPanel extends JPanel
 		}
 		
 		add(addGroupButton);
+		//add(addDefaultGroupButton);
 		add(spacer);
 		
 		updateSize();
@@ -130,5 +144,6 @@ public class ItemGroupListPanel extends JPanel
 	public void setEnabled(boolean enable)
 	{
 		addGroupButton.setEnabled(enable);
+		addDefaultGroupButton.setEnabled(enable);
 	}
 }

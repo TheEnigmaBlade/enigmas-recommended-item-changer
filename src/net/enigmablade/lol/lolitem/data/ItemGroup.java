@@ -3,21 +3,22 @@ package net.enigmablade.lol.lolitem.data;
 import java.util.*;
 import net.enigmablade.lol.lollib.data.*;
 
-
 public class ItemGroup
 {
 	private String name;
 	private List<Item> items;
+	private List<Integer> itemCounts;
 	
 	public ItemGroup(String n)
 	{
-		this(n, new ArrayList<Item>());
+		this(n, new ArrayList<Item>(), new ArrayList<Integer>());
 	}
 	
-	public ItemGroup(String n, List<Item> i)
+	public ItemGroup(String n, List<Item> i, List<Integer> iC)
 	{
 		name = n;
 		items = i;
+		itemCounts = iC;
 	}
 	
 	public String getName()
@@ -30,14 +31,20 @@ public class ItemGroup
 		name = n;
 	}
 	
-	public void addItem(Item i)
+	public void addItem(Item i, int count)
 	{
 		items.add(i);
+		itemCounts.add(count);
 	}
 	
 	public List<Item> getItems()
 	{
 		return items;
+	}
+	
+	public List<Integer> getItemCounts()
+	{
+		return itemCounts;
 	}
 	
 	//Overridden methods
@@ -74,6 +81,6 @@ public class ItemGroup
 	@Override
 	public ItemGroup clone()
 	{
-		return new ItemGroup(name, new ArrayList<Item>(items));
+		return new ItemGroup(name, new ArrayList<Item>(items), new ArrayList<Integer>(itemCounts));
 	}
 }

@@ -6,23 +6,25 @@ import java.awt.dnd.*;
 import java.awt.event.*;
 import java.awt.geom.*;
 import java.util.*;
-
 import javax.swing.*;
 import javax.swing.Timer;
-import net.enigmablade.lol.lolitem.data.filter.*;
-import net.enigmablade.lol.lolitem.ui.*;
-import net.enigmablade.lol.lolitem.ui.components.pretty.*;
-import net.enigmablade.lol.lolitem.ui.dnd.*;
-import net.enigmablade.lol.lolitem.ui.tooltip.*;
-import net.enigmablade.lol.lollib.data.*;
-import net.enigmablade.lol.lollib.io.*;
+import org.jdesktop.swingx.*;
 import org.jdesktop.swingx.painter.*;
+import org.jdesktop.swingx.painter.effects.*;
+
 import net.enigmablade.paradoxion.ui.*;
 import net.enigmablade.paradoxion.util.*;
 
+import net.enigmablade.lol.lollib.data.*;
+import net.enigmablade.lol.lollib.io.*;
+import net.enigmablade.lol.lollib.ui.*;
+import net.enigmablade.lol.lollib.ui.pretty.*;
+
+import net.enigmablade.lol.lolitem.data.filter.*;
+import net.enigmablade.lol.lolitem.ui.dnd.*;
+import net.enigmablade.lol.lolitem.ui.tooltip.*;
+
 import static net.enigmablade.paradoxion.util.Logger.*;
-
-
 
 public class DraggableItem extends ItemPanel implements Comparable<DraggableItem>
 {
@@ -51,7 +53,9 @@ public class DraggableItem extends ItemPanel implements Comparable<DraggableItem
 	
 	private boolean showCount = false, countVisible = false;
 	private JButton countDownButton, countUpButton;
-	private JLabel countLabel;
+	private JXLabel countLabel;
+	private TextPainter countLabelPainter;
+	private int count;
 	
 	//Other
 	
@@ -84,14 +88,18 @@ public class DraggableItem extends ItemPanel implements Comparable<DraggableItem
 		itemFilterModel = model;
 		showCount = sC;
 		
+		count = 1;
+		
 		if(item != null)
 		{
 			itemImage = baseItemImage = GamePathUtil.getItemImage(item.getImage());
+			if(itemImage == null)
+				itemImage = baseItemImage = ResourceLoader.getImage("missing_items/"+item.getImage()+".png");
 			setToolTipText(item.getToolTip());
 		}
-		if(item == null || itemImage == null)
+		if(itemImage == null)
 			itemImage = baseItemImage = GamePathUtil.getItemImage("EmptyIcon");
-		if(item == null || itemImage == null)
+		if(itemImage == null)
 			itemImage = baseItemImage = ResourceLoader.getImage("null.png");
 		
 		stats = item != null ? item.getStats() : new HashMap<String, String>();
@@ -104,45 +112,90 @@ public class DraggableItem extends ItemPanel implements Comparable<DraggableItem
 		originalHeight = baseItemImage.getHeight(null);
 		setItemSize(originalWidth, originalHeight);
 		
-		if(showCount)
-			initCountUI();
+		DraggableItemMouseHoverListener dragList = new DraggableItemMouseHoverListener();
 		
-		addMouseListener(new DraggableItemMouseListener());
+		if(showCount)
+			initCountUI(dragList);
+		
+		addMouseListener(dragList);
+		addMouseListener(new DraggableItemMouseClickListener());
 		addMouseMotionListener(new DraggableItemMouseMotionListener());
 		
 		new ItemDropTargetListener();
 	}
 	
-	private void initCountUI()
+	private void initCountUI(DraggableItemMouseHoverListener dragList)
 	{
-		setLayout(new BorderLayout());
+		GridBagLayout gridBagLayout = new GridBagLayout();
+		gridBagLayout.columnWidths = new int[]{2, 12, 12, 12, 2, 0};
+		gridBagLayout.rowHeights = new int[]{0, 16, 0};
+		gridBagLayout.columnWeights = new double[]{1.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
+		gridBagLayout.rowWeights = new double[]{1.0, 0.0, Double.MIN_VALUE};
+		setLayout(gridBagLayout);
 		
-		//JPanel countAlignPanel = new JPanel();
-		//countAlignPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
-		//countAlignPanel.setOpaque(false);
-		//add(countAlignPanel, BorderLayout.SOUTH);
-		
-		JPanel countPanel = new JPanel();
-		countPanel.setLayout(new BorderLayout());
-		countPanel.setPreferredSize(new Dimension(0, 20));
-		countPanel.setOpaque(false);
-		add(countPanel, BorderLayout.SOUTH);
-		
-		countDownButton = new PrettyButton("-");
-		countDownButton.setPreferredSize(new Dimension(20, 20));
+		countDownButton = new PrettyButton("\u2212");
+		countDownButton.setBorder(null);
+		countDownButton.setPreferredSize(new Dimension(12, 12));
+		//countDownButton.setSize(new Dimension(14, 14));
 		countDownButton.setVisible(false);
-		countPanel.add(countDownButton, BorderLayout.WEST);
+		countDownButton.addMouseListener(dragList);
+		countDownButton.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				changeCount(-1);
+			}
+		});
+		GridBagConstraints gbc_countDownButton = new GridBagConstraints();
+		gbc_countDownButton.fill = GridBagConstraints.HORIZONTAL;
+		gbc_countDownButton.gridx = 1;
+		gbc_countDownButton.gridy = 1;
+		add(countDownButton, gbc_countDownButton);
 		
 		countUpButton = new PrettyButton("+");
-		countUpButton.setPreferredSize(new Dimension(20, 20));
+		countUpButton.setBorder(null);
+		countUpButton.setPreferredSize(new Dimension(12, 12));
+		//countUpButton.setSize(new Dimension(18, 18));
 		countUpButton.setVisible(false);
-		countPanel.add(countUpButton, BorderLayout.EAST);
+		countUpButton.addMouseListener(dragList);
+		countUpButton.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				changeCount(1);
+			}
+		});
+		GridBagConstraints gbc_countUpButton = new GridBagConstraints();
+		gbc_countUpButton.fill = GridBagConstraints.HORIZONTAL;
+		gbc_countUpButton.gridx = 3;
+		gbc_countUpButton.gridy = 1;
+		add(countUpButton, gbc_countUpButton);
 		
-		countLabel = new JLabel("1");
-		countPanel.add(countLabel, BorderLayout.CENTER);
+		countLabel = new JXLabel(count+"");
+		countLabel.setPreferredSize(new Dimension(12, 16));
+		countLabel.setVisible(false);
+		countLabel.setHorizontalAlignment(JLabel.CENTER);
+		
+		countLabelPainter = new TextPainter();
+		countLabelPainter.setFont(getFont());
+		//countLabelPainter.setFillPaint(getForeground());
+		countLabelPainter.setAntialiasing(true);
+		countLabelPainter.setFillHorizontal(false);
+		ShadowPathEffect shadow = new ShadowPathEffect();
+		shadow.setEffectWidth(4);
+		shadow.setBrushColor(UIUtil.scale(UIUtil.FOREGROUND, 0.42f));
+		shadow.setOffset(new Point(0, 0));
+		countLabelPainter.setAreaEffects(shadow);
+		countLabel.setBackgroundPainter(countLabelPainter);
+		
+		GridBagConstraints gbc_countLabel = new GridBagConstraints();
+		gbc_countLabel.fill = GridBagConstraints.NONE;
+		gbc_countLabel.gridx = 2;
+		gbc_countLabel.gridy = 1;
+		add(countLabel, gbc_countLabel);
 	}
 	
-	private class DraggableItemMouseListener extends MouseAdapter
+	private class DraggableItemMouseClickListener extends MouseAdapter
 	{
 		private boolean doubleClicked = false;
 		
@@ -216,7 +269,10 @@ public class DraggableItem extends ItemPanel implements Comparable<DraggableItem
 			mouseAction(true);
 			setCursor(null);
 		}
-		
+	}
+	
+	private class DraggableItemMouseHoverListener extends MouseAdapter
+	{
 		@Override
 		public void mouseEntered(MouseEvent evt)
 		{
@@ -230,13 +286,6 @@ public class DraggableItem extends ItemPanel implements Comparable<DraggableItem
 			mouseAction(false);
 			setCursor(null);
 		}
-		
-		private void mouseAction(boolean sG)
-		{
-			showGlow = sG;
-			showDarkGlow = false;
-			repaint();
-		}
 	}
 	
 	private class DraggableItemMouseMotionListener extends MouseMotionAdapter
@@ -246,6 +295,23 @@ public class DraggableItem extends ItemPanel implements Comparable<DraggableItem
 		{
 			clearGlow();
 		}
+	}
+	
+	private void mouseAction(boolean sG)
+	{
+		showGlow = sG;
+		showDarkGlow = false;
+		
+		countVisible = sG;
+		if(showCount)
+		{		
+			countDownButton.setVisible(countVisible);
+			countUpButton.setVisible(countVisible);
+			if(count == 1)
+				countLabel.setVisible(countVisible);
+		}
+		
+		repaint();
 	}
 	
 	private void addItemAction()
@@ -310,8 +376,7 @@ public class DraggableItem extends ItemPanel implements Comparable<DraggableItem
 		g.setClip(newClip);
 		g.drawImage(itemImage, 0, 0, this);
 		
-		
-		
+		//Draw glow
 		if(showGlow)
 		{
 			glossPainter.paint(g, this, width, height);
@@ -474,6 +539,13 @@ public class DraggableItem extends ItemPanel implements Comparable<DraggableItem
 	public void clearGlow()
 	{
 		showGlow = showDarkGlow = false;
+		countVisible = false;
+		if(showCount)
+		{		
+			countDownButton.setVisible(countVisible);
+			countUpButton.setVisible(countVisible);
+			countLabel.setVisible(count != 1);
+		}
 		repaint();
 	}
 	
@@ -482,6 +554,26 @@ public class DraggableItem extends ItemPanel implements Comparable<DraggableItem
 		countVisible = show;
 		revalidate();
 		repaint();
+	}
+	
+	private void changeCount(int amt)
+	{
+		setItemCount(count+amt);
+	}
+	
+	public int getItemCount()
+	{
+		return count;
+	}
+	
+	public void setItemCount(int c)
+	{
+		count = c < 1 ? 1 : c;
+		
+		countLabel.setText(count+"");
+		countLabelPainter.setText(count+"");
+		
+		countLabel.setVisible(count != 1);
 	}
 	
 	//Connections to BuildPanel

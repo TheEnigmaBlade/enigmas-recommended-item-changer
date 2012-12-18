@@ -7,10 +7,10 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.text.*;
-import net.enigmablade.lol.lolitem.ui.components.pretty.*;
+
+import net.enigmablade.lol.lollib.ui.pretty.*;
 
 import static net.enigmablade.paradoxion.util.Logger.*;
-
 
 public class ItemBuildComboBox extends PrettyComboBox<String>
 {

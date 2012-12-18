@@ -1,6 +1,15 @@
-Version 3.0.1
+Version 3.1.0
 -------------
-* A number of fixes for startup crashes
+* Added default items (start-up time is slightly longer)
+* Added ability to change the number of items
+* Added item filtering based on current mode
+* Added missing build modification things from pre-season 3 version
+* Fixed a number of startup crashes
+* Fixed some Twisted Treeline item images not showing
+* Fixed the favorite champion dialog from creating a fatal crash
+* Fixed other minor UI issues
+* Maybe fixed some SEA incompatibilities
+* Editing builds for "any" game mode is disabled until critical game bugs are fixed
 
 Version 3.0.0
 -------------

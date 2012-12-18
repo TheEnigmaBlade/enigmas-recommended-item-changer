@@ -1,17 +1,18 @@
 package net.enigmablade.lol.lolitem.ui.dialogs;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.util.*;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.border.*;
+
 import net.enigmablade.paradoxion.localization.*;
 import net.enigmablade.paradoxion.ui.models.*;
-import net.enigmablade.lol.lollib.data.*;
-import net.enigmablade.lol.lolitem.ui.components.pretty.*;
-import net.enigmablade.lol.lolitem.ui.renderers.*;
-import java.awt.event.*;
 
+import net.enigmablade.lol.lollib.data.*;
+import net.enigmablade.lol.lollib.ui.pretty.*;
+import net.enigmablade.lol.lollib.ui.renderers.*;
 
 @SuppressWarnings("unchecked")
 public class FavoritesDialog extends JDialog
@@ -254,7 +255,11 @@ public class FavoritesDialog extends JDialog
 		SortedListModel<String> favModel = (SortedListModel<String>)(favoritesList.getModel());
 		favModel.clear();
 		for(String s : fav)
-			favModel.addElement(ChampionDatabase.getChampion(s).getName());
+		{
+			Champion champion = ChampionDatabase.getChampion(s);
+			if(champion != null)
+				favModel.addElement(champion.getName());
+		}
 	}
 	
 	private List<String> getFavorites()
@@ -267,12 +272,12 @@ public class FavoritesDialog extends JDialog
 		allBackup.clear();
 		SortedListModel<String> allModel = (SortedListModel<String>)championsList.getModel();
 		for(int n = 0; n < allModel.getSize(); n++)
-			allBackup.add(allModel.getElementAt(n));
+			allBackup.add(ChampionDatabase.getChampionKey(allModel.getElementAt(n)));
 		
 		favBackup.clear();
 		SortedListModel<String> favModel = (SortedListModel<String>)favoritesList.getModel();
 		for(int n = 0; n < favModel.getSize(); n++)
-			favBackup.add(favModel.getElementAt(n));
+			favBackup.add(ChampionDatabase.getChampionKey(favModel.getElementAt(n)));
 		
 		dispose();
 	}

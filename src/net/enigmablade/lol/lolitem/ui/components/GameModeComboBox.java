@@ -2,10 +2,11 @@ package net.enigmablade.lol.lolitem.ui.components;
 
 import java.awt.*;
 import javax.swing.*;
-import net.enigmablade.lol.lolitem.ui.components.pretty.*;
-import net.enigmablade.lol.lolitem.ui.renderers.*;
-import net.enigmablade.lol.lollib.data.*;
 
+import net.enigmablade.lol.lolitem.ui.renderers.*;
+
+import net.enigmablade.lol.lollib.ui.pretty.*;
+import net.enigmablade.lol.lollib.data.*;
 
 public class GameModeComboBox extends PrettyComboBox<GameMode>
 {

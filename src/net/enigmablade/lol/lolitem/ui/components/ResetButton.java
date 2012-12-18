@@ -1,8 +1,8 @@
 package net.enigmablade.lol.lolitem.ui.components;
 
 import java.awt.*;
-import net.enigmablade.lol.lolitem.ui.components.pretty.*;
 
+import net.enigmablade.lol.lollib.ui.pretty.*;
 
 public class ResetButton extends PrettyButton
 {

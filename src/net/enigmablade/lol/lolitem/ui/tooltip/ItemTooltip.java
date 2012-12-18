@@ -7,11 +7,11 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.plaf.basic.*;
+
 import net.enigmablade.paradoxion.ui.*;
-import net.enigmablade.lol.lolitem.ui.*;
+
 import net.enigmablade.lol.lollib.data.*;
-
-
+import net.enigmablade.lol.lollib.ui.*;
 
 public class ItemTooltip extends JToolTip
 {

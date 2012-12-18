@@ -8,6 +8,17 @@ import javax.swing.event.*;
 import net.enigmablade.paradoxion.io.cache.*;
 import net.enigmablade.paradoxion.localization.*;
 import net.enigmablade.paradoxion.util.*;
+import static net.enigmablade.paradoxion.util.Logger.*;
+
+import net.enigmablade.lol.lollib.data.*;
+import net.enigmablade.lol.lollib.io.*;
+import net.enigmablade.lol.lollib.io.pathhelpers.platforms.*;
+import net.enigmablade.lol.lollib.io.pathhelpers.regions.*;
+import net.enigmablade.lol.lollib.ui.*;
+import net.enigmablade.lol.lollib.ui.dialogs.*;
+import net.enigmablade.lol.lollib.ui.renderers.*;
+import net.enigmablade.lol.lollib.util.*;
+
 import net.enigmablade.lol.lolitem.data.*;
 import net.enigmablade.lol.lolitem.data.filter.*;
 import net.enigmablade.lol.lolitem.io.*;
@@ -15,20 +26,12 @@ import net.enigmablade.lol.lolitem.io.BuildFileIO.*;
 import net.enigmablade.lol.lolitem.ui.*;
 import net.enigmablade.lol.lolitem.ui.components.*;
 import net.enigmablade.lol.lolitem.ui.components.ItemBuildComboBox.*;
-import net.enigmablade.lol.lolitem.ui.renderers.*;
-import net.enigmablade.lol.lolitem.util.*;
-import net.enigmablade.lol.lollib.data.*;
-import net.enigmablade.lol.lollib.gui.dialogs.*;
-import net.enigmablade.lol.lollib.io.*;
-import net.enigmablade.lol.lollib.io.pathhelpers.platforms.*;
-import net.enigmablade.lol.lollib.io.pathhelpers.regions.*;
-import static net.enigmablade.paradoxion.util.Logger.*;
 
 public class EnigmaItems
 {
 	public static final String appName = "Enigma's Recommended Item Changer";
 	public static final String appKey = "EnigmaItem";
-	public static final String version = "3.0.1", buildVersion = "0", versionAdd = "";
+	public static final String version = "3.1.0", buildVersion = "2", versionAdd = "";
 	
 	//UI
 	private MainUI ui;
@@ -58,9 +61,10 @@ public class EnigmaItems
 	{
 		writeToLog("App info: "+appName+" ("+appKey+"), v"+version+"b"+buildVersion+" "+versionAdd);
 		
-		UpdateUtil.finishUpdate();
+		UpdateUtil.finishUpdate(appKey);
 		
 		writeToLog("Begin startup initialization");
+		long loadStartTime = System.nanoTime();
 		
 		//Options
 		options = Options.loadOptions();
@@ -70,7 +74,7 @@ public class EnigmaItems
 		{
 			SplashScreen.drawString("Checking version...");
 			UpdateUtil.startUpdater(appKey, version, buildVersion, false);
-			UpdateUtil.startCacheUpdater(false);
+			UpdateUtil.startCacheUpdater(false, "items.xml");
 		}
 		
 		//Cache
@@ -81,7 +85,7 @@ public class EnigmaItems
 		{
 			writeToLog("Failed to extract resource cache", LoggingType.ERROR);
 			JOptionPane.showMessageDialog(null, "Failed to extract data files", "Load error", JOptionPane.ERROR_MESSAGE);
-			SystemUtil.exit(1);
+			//SystemUtil.exit(1);
 		}
 		
 		//Locales
@@ -98,22 +102,27 @@ public class EnigmaItems
 		writeToLog("Initializing UI");
 		initUI();
 		
-		ToolTipManager.sharedInstance().setInitialDelay(100);
-		ToolTipManager.sharedInstance().setReshowDelay(500);
-		ToolTipManager.sharedInstance().setDismissDelay(Integer.MAX_VALUE);
-		
 		//Data
 		SplashScreen.drawString("Loading data...");
+		
+		SplashScreen.drawSubString("Default items");
+		BuildFileIO.initDefaultItems(appKey);
+		
 		writeToLog("Initializing item data");
+		SplashScreen.drawSubString("Items");
 		boolean success = loadItems();
 		writeToLog("Initializing champion data");
+		SplashScreen.drawSubString("Champions");
 		success &= loadChampions();
 		
 		if(success)
 		{
 			setChampion(null);
 			
-			writeToLog("Startup initialization complete");
+			long loadEndTime = System.nanoTime();
+			long diff = (loadEndTime-loadStartTime)/1000;
+			long diffMS = diff/1000;
+			writeToLog("Startup initialization complete: "+diffMS+" ms ("+(diffMS/1000.0)+" s)");
 			//checkGameVersion();
 			writeToLog("------------------------------------");
 		}
@@ -171,7 +180,7 @@ public class EnigmaItems
 	{
 		ui.open();
 		
-		if(options.firstStartup)
+		/*if(options.firstStartup)
 		{
 			JOptionPane.showMessageDialog(ui,
 					"This update (3.0) is a complete rebuild of the original item changer.\n" +
@@ -179,7 +188,7 @@ public class EnigmaItems
 					"- Default items\n" +
 					"- Game mode item filtering\n",
 					"Release Info", JOptionPane.INFORMATION_MESSAGE);
-		}
+		}*/
 	}
 	
 	public void close()
@@ -304,17 +313,17 @@ public class EnigmaItems
 		}
 	}
 	
-	public void addBuild()
+	public void addBuild(String name)
 	{
 		writeToLog("Adding new build");
 		
-		String name = "New build"+(championBuilds != null ? " "+(championBuilds.size()+1) : "");
+		name = name == null ? "New build"+(championBuilds != null ? " "+(championBuilds.size()+1) : "") : name;
 		
-		ItemBuild build = new ItemBuild(name);
+		ItemBuild build = new ItemBuild(name, currentGameMode.getMapID(), currentGameMode.getModeID());
 		String[] names = {"Starting", "Essential", "Offensive", "Defensive"};
 		for(int n = 0; n < 4; n++)
 		{
-			ItemGroup set = new ItemGroup(names[n]+(championBuilds != null ? " "+(championBuilds.size()+1) : ""));
+			ItemGroup set = new ItemGroup(names[n]/*+(championBuilds != null ? " "+(championBuilds.size()+1) : "")*/);
 			build.addGroup(set);
 		}
 		
@@ -345,7 +354,12 @@ public class EnigmaItems
 	
 	public void duplicateBuild()
 	{
-		//TODO
+		if(championBuilds != null && currentBuildIndex >= 0)
+		{
+			ItemBuild build = championBuilds.get(currentBuildIndex);
+			addBuild(build.getName()+" (Copy)");
+			ui.setBuild(build);
+		}
 	}
 	
 	public void addBuildGroup()
@@ -424,17 +438,40 @@ public class EnigmaItems
 	
 	public void reset()
 	{
-		//TODO
+		if(championBuilds != null && currentBuildIndex >= 0)
+		{
+			ItemBuild build = championBuilds.get(currentBuildIndex);
+			ui.setBuild(build);
+		}
 	}
 	
 	public void resetToDefaults()
 	{
-		//TODO
+		if(championBuilds != null && currentBuildIndex >= 0)
+		{
+			ItemBuild build = championBuilds.get(currentBuildIndex);
+			ItemBuild defaultBuild = BuildFileIO.loadDefaultBuild(currentChampion, currentGameMode);
+			defaultBuild.setName(build.getName());
+			defaultBuild.setAuthor(build.getAuthor());
+			defaultBuild.setDescription(build.getDescription());
+			defaultBuild.setPriority(build.isPriority());
+			defaultBuild.setType(build.getType());
+			ui.setBuild(defaultBuild);
+		}
 	}
 	
 	public void clearBuild()
 	{
-		//TODO
+		if(championBuilds != null && currentBuildIndex >= 0)
+		{
+			ItemBuild build = championBuilds.get(currentBuildIndex);
+			ItemBuild clearedBuild = new ItemBuild(build.getName(), build.getMap(), build.getMode());
+			clearedBuild.setAuthor(build.getAuthor());
+			clearedBuild.setDescription(build.getDescription());
+			clearedBuild.setPriority(build.isPriority());
+			clearedBuild.setType(build.getType());
+			ui.setBuild(clearedBuild);
+		}
 	}
 	
 	public void clearRelatedItemFilter()
@@ -602,15 +639,39 @@ public class EnigmaItems
 	public void loadChampionBuilds()
 	{
 		writeToLog("Loading builds for Champion \""+currentChampion+"\", "+currentGameMode);
-		championBuilds = currentChampion != null ? BuildFileIO.loadBuilds(currentChampion, currentGameMode) : null;
+		championBuilds = currentChampion != null ? BuildFileIO.loadCustomBuilds(currentChampion, currentGameMode) : null;
 		if(championBuilds == null)
 		{
 			writeToLog("No builds exist", 1);
-			championBuilds = null;
-			currentBuildIndex = -1;
-			ui.setBuilds(null);
-			//ui.setBuild(null);
-			ui.enableBuildEditing(false);
+			boolean loaded = false;
+			if(options.useDefaultItems && currentChampion != null && currentGameMode != null)
+			{
+				ItemBuild defaultBuild = BuildFileIO.loadDefaultBuild(currentChampion, currentGameMode);
+				if(loaded = defaultBuild != null)
+				{
+					defaultBuild.setName("Default Items");
+					
+					championBuilds = new ArrayList<ItemBuild>(1);
+					championBuilds.add(defaultBuild);
+					ArrayList<String> names = new ArrayList<String>(1);
+					names.add(defaultBuild.getName());
+					
+					currentBuildIndex = -1;
+					ui.setBuilds(names);
+					ui.enableBuildEditing(true);
+					
+					loaded = true;
+				}
+			}
+			
+			if(!loaded)
+			{
+				championBuilds = null;
+				currentBuildIndex = -1;
+				ui.setBuilds(null);
+				//ui.setBuild(null);
+				ui.enableBuildEditing(false);
+			}
 		}
 		else
 		{
@@ -635,7 +696,7 @@ public class EnigmaItems
 		if(toIndex != -1)
 		{
 			writeToLog("Storing current build to index: "+toIndex);
-			ItemBuild build = ui.getBuild(toIndex);
+			ItemBuild build = ui.getBuild(toIndex, currentGameMode);
 			writeToLog("Current build: "+build, 1);
 			if(championBuilds != null)
 			{

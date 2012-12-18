@@ -2,22 +2,25 @@ package net.enigmablade.lol.lolitem.data;
 
 import java.util.*;
 
-public class ItemBuild
+public class ItemBuild implements Comparable<ItemBuild>
 {
 	private String name;
 	private String description;
 	private String author;
 	private String type;
+	
+	private String map, mode;
+	
 	private List<ItemGroup> itemSets;
 	
 	private boolean isPriority;
 	
-	public ItemBuild(String name)
+	public ItemBuild(String name, String map, String mode)
 	{
-		this(name, new ArrayList<ItemGroup>());
+		this(name, map, mode, new ArrayList<ItemGroup>());
 	}
 	
-	public ItemBuild(String name, List<ItemGroup> itemSets)
+	public ItemBuild(String name, String map, String mode, List<ItemGroup> itemSets)
 	{
 		this.name = name;
 		this.itemSets = itemSets;
@@ -69,6 +72,16 @@ public class ItemBuild
 		return type;
 	}
 	
+	public String getMap()
+	{
+		return map;
+	}
+	
+	public String getMode()
+	{
+		return mode;
+	}
+	
 	public void setPriority(boolean isPriority)
 	{
 		this.isPriority = isPriority;
@@ -94,9 +107,17 @@ public class ItemBuild
 		return itemSets;
 	}
 	
+	//Overrides
+	
 	@Override
 	public String toString()
 	{
 		return "ItemBuild[name=\""+name+"\", type=\""+type+"\", author=\""+author+"\"]";
+	}
+
+	@Override
+	public int compareTo(ItemBuild o)
+	{
+		return name.compareTo(o.name);
 	}
 }

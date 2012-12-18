@@ -175,10 +175,16 @@ public class BuildPanel extends JPanel implements DragGestureListener
 	
 	public void addItem(Item i)
 	{
+		addItem(i, 1);
+	}
+	
+	public void addItem(Item i, int count)
+	{
 		DraggableItem item = new DraggableItem(i, itemFilterModel, true);
 		item.setBuildParent(this);
 		dragSource.createDefaultDragGestureRecognizer(item, DnDConstants.ACTION_MOVE, this);
 		item.setItemSize(itemSize, itemSize);
+		item.setItemCount(count);
 		items.add(item);
 		add(item);
 		
@@ -226,6 +232,14 @@ public class BuildPanel extends JPanel implements DragGestureListener
 		List<Item> list = new ArrayList<Item>(items.size());
 		for(DraggableItem di : items)
 			list.add(di.getItem());
+		return list;
+	}
+	
+	public List<Integer> getItemCounts()
+	{
+		List<Integer> list = new ArrayList<Integer>(items.size());
+		for(DraggableItem di : items)
+			list.add(di.getItemCount());
 		return list;
 	}
 }

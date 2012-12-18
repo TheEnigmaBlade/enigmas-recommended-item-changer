@@ -1,16 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry excluding="enigma/installer/|enigma/lol/lolitem/LoLItems.java|enigma/lol/lolitem/LoLItemsMain.java|enigma/lol/lolitem/util/LockUtil.java|net/enigmablade/lol/lolitem/util/LockUtil.java" kind="src" path="src"/>
+	<classpathentry excluding="enigma/installer/|enigma/lol/lolitem/LoLItems.java|enigma/lol/lolitem/LoLItemsMain.java|enigma/lol/lolitem/util/LockUtil.java|net/enigmablade/lol/lolitem/util/LockUtil.java|net/enigmablade/lol/lolitem/ui/renderers/ItemSetListCellRenderer.java" kind="src" path="src"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Paradoxion Util"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Paradoxion UI"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/LoL Lib"/>
 	<classpathentry kind="lib" path="lib/sqlitejdbc.jar"/>
-	<classpathentry kind="lib" path="lib/swingx.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="jar:file:/C:/Users/EnigmaBlade/Programming/Java API/swingx-javadoc.jar!/"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="lib" path="lib/json-simple.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="/LoL Lib/lib/swingx.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

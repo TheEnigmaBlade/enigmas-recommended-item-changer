@@ -20,17 +20,19 @@ import net.enigmablade.paradoxion.ui.components.translucent.*;
 import net.enigmablade.paradoxion.util.*;
 import static net.enigmablade.paradoxion.util.Logger.*;
 
+import net.enigmablade.lol.lollib.data.*;
+import net.enigmablade.lol.lollib.io.*;
+import net.enigmablade.lol.lollib.ui.*;
+import net.enigmablade.lol.lollib.ui.pretty.*;
+
 import net.enigmablade.lol.lolitem.*;
 import net.enigmablade.lol.lolitem.data.*;
 import net.enigmablade.lol.lolitem.data.filter.*;
 import net.enigmablade.lol.lolitem.ui.components.*;
 import net.enigmablade.lol.lolitem.ui.components.items.*;
-import net.enigmablade.lol.lolitem.ui.components.pretty.*;
 import net.enigmablade.lol.lolitem.ui.dialogs.*;
 import net.enigmablade.lol.lolitem.ui.dnd.*;
 import net.enigmablade.lol.lolitem.ui.models.*;
-import net.enigmablade.lol.lollib.data.*;
-import net.enigmablade.lol.lollib.io.*;
 
 public class MainUI extends JFrame implements DragGestureListener
 {
@@ -71,9 +73,8 @@ public class MainUI extends JFrame implements DragGestureListener
 	private JScrollPane draggableItemsScrollPane;
 	private JButton draggableItemsModeButton;
 	private DraggableItemContainer draggableItemGridPanel, draggableItemListPanel;
-	
-	private JCheckBox sortTypeCheckBox;
 	private JRadioButton sortDescendingRadioButton, sortAscendingRadioButton;
+	private ItemFilterComboBox sortComboBox;
 	private JCheckBox adCheckBox, apCheckBox, hCheckBox, arCheckBox;
 	private JCheckBox asCheckBox, cdCheckBox, healthRegenCheckBox, mrCheckBox;
 	private JCheckBox lsCheckBox, svCheckBox, mCheckBox, tenCheckBox;
@@ -126,28 +127,11 @@ public class MainUI extends JFrame implements DragGestureListener
 	
 	private void initGlobal()
 	{
-		/*Font mainFont;
-		try
-		{
-			//mainFont = Font.createFont(Font.TRUETYPE_FONT, ResourceLoader.getResourceStream("fritz.ttf"));
-			//mainFont = mainFont.deriveFont(12.0f);
-			mainFont = new Font("Georgia", Font.PLAIN, 10);
-		}
-		catch(Exception e)
-		{
-			writeToLog("Failed to load font \"fritz\"", LoggingType.WARNING);
-			writeStackTrace(e);
-			mainFont = new Font("Times New Roman", Font.PLAIN, 12);
-		}
-		UIUtil.setUIFont(new FontUIResource(mainFont));*/
+		ToolTipManager.sharedInstance().setInitialDelay(250);
+		ToolTipManager.sharedInstance().setReshowDelay(500);
+		ToolTipManager.sharedInstance().setDismissDelay(Integer.MAX_VALUE);
 		
-		UIUtil.setUIBackground(UIUtil.BACKGROUND);
-		UIUtil.setUISelectionBackground(UIUtil.FOREGROUND.darker());
-		
-		UIUtil.setUIForeground(UIUtil.FOREGROUND);
-		UIUtil.setUIDisabledForeground(UIUtil.DISABLED_FOREGROUND);
-		
-		//UIManager.put("ButtonUI", PrettyButton.PrettyButtonUI.class.getName());
+		PrettyLAF.initLAF();
 	}
 	
 	private void initMenuBar()
@@ -219,7 +203,7 @@ public class MainUI extends JFrame implements DragGestureListener
 		
 		duplicateBuildMenuItem = new JMenuItem("Duplicate");
 		duplicateBuildMenuItem.setMnemonic('d');
-		//buildMenu.add(duplicateBuildMenuItem);
+		buildMenu.add(duplicateBuildMenuItem);
 		duplicateBuildMenuItem.setEnabled(false);
 		
 		copyBuildMenuItem = new JMenuItem("Copy...");
@@ -250,8 +234,9 @@ public class MainUI extends JFrame implements DragGestureListener
 		resetBuildMenuItem.setEnabled(false);
 		
 		resetDefaultsBuildMenuItem = new JMenuItem("Reset to defaults");
-		resetDefaultsBuildMenuItem.setMnemonic('f');
-		//TODO: buildMenu.add(resetDefaultsBuildMenuItem);
+		resetDefaultsBuildMenuItem.setMnemonic('d');
+		resetDefaultsBuildMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.CTRL_MASK));
+		buildMenu.add(resetDefaultsBuildMenuItem);
 		resetDefaultsBuildMenuItem.setEnabled(false);
 		
 		//Options menu
@@ -481,7 +466,7 @@ public class MainUI extends JFrame implements DragGestureListener
 			@Override
 			public void actionPerformed(ActionEvent evt)
 			{
-				main.addBuild();
+				main.addBuild(null);
 			}
 		});
 		duplicateBuildMenuItem.addActionListener(new ActionListener(){
@@ -523,7 +508,7 @@ public class MainUI extends JFrame implements DragGestureListener
 			@Override
 			public void actionPerformed(ActionEvent evt)
 			{
-				main.loadChampionBuilds();
+				main.reset();
 			}
 		});
 		resetDefaultsBuildMenuItem.addActionListener(new ActionListener(){
@@ -942,6 +927,7 @@ public class MainUI extends JFrame implements DragGestureListener
 		extraInfoCollapsibleContentPane.add(authorLabel, gbc_authorLabel);
 		
 		authorField = new JTextField();
+		authorField.setBorder(new LineBorder(UIUtil.BORDER));
 		authorField.setCaretColor(UIUtil.FOREGROUND);
 		GridBagConstraints gbc_authorField = new GridBagConstraints();
 		gbc_authorField.insets = new Insets(0, 0, 2, 0);
@@ -960,6 +946,7 @@ public class MainUI extends JFrame implements DragGestureListener
 		extraInfoCollapsibleContentPane.add(typeLabel, gbc_typeLabel);
 		
 		typeField = new JTextField();
+		typeField.setBorder(new LineBorder(UIUtil.BORDER));
 		typeField.setCaretColor(UIUtil.FOREGROUND);
 		GridBagConstraints gbc_typeField = new GridBagConstraints();
 		gbc_typeField.insets = new Insets(0, 0, 2, 0);
@@ -978,10 +965,13 @@ public class MainUI extends JFrame implements DragGestureListener
 		extraInfoCollapsibleContentPane.add(descriptionLabel, gbc_descriptionLabel);
 		
 		JScrollPane descriptionScrollPane = new JScrollPane();
+		descriptionScrollPane.setBorder(new LineBorder(UIUtil.BORDER));
 		descriptionScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		descriptionScrollPane.setVerticalScrollBar(new PrettyScrollBar(JScrollBar.VERTICAL));
+		JScrollBar bar = new PrettyScrollBar(JScrollBar.VERTICAL);
+		bar.setUnitIncrement(4);
+		bar.setBlockIncrement(8);
+		descriptionScrollPane.setVerticalScrollBar(bar);
 		descriptionScrollPane.setPreferredSize(new Dimension(0, 44));
-		descriptionScrollPane.getVerticalScrollBar().setUnitIncrement(4);
 		GridBagConstraints gbc_descriptionScrollPane = new GridBagConstraints();
 		gbc_descriptionScrollPane.fill = GridBagConstraints.BOTH;
 		gbc_descriptionScrollPane.gridx = 1;
@@ -1010,11 +1000,13 @@ public class MainUI extends JFrame implements DragGestureListener
 		JScrollPane buildGroupScrollPane = new JScrollPane();
 		buildGroupScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		buildGroupScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		buildGroupScrollPane.setVerticalScrollBar(new PrettyScrollBar(JScrollBar.VERTICAL));
+		JScrollBar bar2 = new PrettyScrollBar(JScrollBar.VERTICAL);
+		bar2.setUnitIncrement(16);
+		bar2.setBlockIncrement(32);
+		buildGroupScrollPane.setVerticalScrollBar(bar2);
 		buildGroupScrollPane.setOpaque(false);
 		buildGroupScrollPane.getViewport().setOpaque(false);
 		buildGroupScrollPane.setBorder(null);
-		buildGroupScrollPane.getVerticalScrollBar().setUnitIncrement(8);
 		GridBagConstraints gbc_buildGroupScrollPane = new GridBagConstraints();
 		gbc_buildGroupScrollPane.gridwidth = 4;
 		gbc_buildGroupScrollPane.fill = GridBagConstraints.BOTH;
@@ -1122,13 +1114,16 @@ public class MainUI extends JFrame implements DragGestureListener
 		sortButtonGroup.add(sortAscendingRadioButton);
 		sortButtonGroup.add(sortDescendingRadioButton);
 		
-		sortTypeCheckBox = new PrettyCheckBox("Group by type");
-		sortTypeCheckBox.setVisible(false);
-		GridBagConstraints gbc_sortTypeCheckBox = new GridBagConstraints();
-		gbc_sortTypeCheckBox.anchor = GridBagConstraints.WEST;
-		gbc_sortTypeCheckBox.gridx = 0;
-		gbc_sortTypeCheckBox.gridy = 3;
-		sortPanel.add(sortTypeCheckBox, gbc_sortTypeCheckBox);
+		sortComboBox = new ItemFilterComboBox();
+		sortComboBox.setVisible(false);
+		sortComboBox.setBorder(null);
+		sortComboBox.setOpaque(false);
+		sortComboBox.setPreferredSize(new Dimension(0, 22));
+		GridBagConstraints gbc_sortComboBox = new GridBagConstraints();
+		gbc_sortComboBox.fill = GridBagConstraints.HORIZONTAL;
+		gbc_sortComboBox.gridx = 0;
+		gbc_sortComboBox.gridy = 3;
+		sortPanel.add(sortComboBox, gbc_sortComboBox);
 		
 		filterCheckBoxes = new ArrayList<JCheckBox>();
 		
@@ -1298,8 +1293,10 @@ public class MainUI extends JFrame implements DragGestureListener
 		draggableItemsScrollPane.setBorder(new LineBorder(UIUtil.BORDER));
 		draggableItemsScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		draggableItemsScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		draggableItemsScrollPane.setVerticalScrollBar(new PrettyScrollBar(JScrollBar.VERTICAL));
-		draggableItemsScrollPane.getVerticalScrollBar().setUnitIncrement(8);
+		JScrollBar bar3 = new PrettyScrollBar(JScrollBar.VERTICAL);
+		bar3.setUnitIncrement(16);
+		bar3.setBlockIncrement(32);
+		draggableItemsScrollPane.setVerticalScrollBar(bar3);
 		draggableItemsScrollPane.setOpaque(false);
 		draggableItemsScrollPane.getViewport().setOpaque(false);
 		contentPanel.add(draggableItemsScrollPane, BorderLayout.CENTER);
@@ -1369,7 +1366,7 @@ public class MainUI extends JFrame implements DragGestureListener
 			@Override
 			public void actionPerformed(ActionEvent evt)
 			{
-				main.addBuild();
+				main.addBuild(null);
 			}
 		});
 		buildRemoveButton.addActionListener(new ActionListener(){
@@ -1632,9 +1629,9 @@ public class MainUI extends JFrame implements DragGestureListener
 		return buildComboBox.getSelectedIndex();
 	}
 	
-	public ItemBuild getBuild(int index)
+	public ItemBuild getBuild(int index, GameMode mode)
 	{
-		ItemBuild build = new ItemBuild((String)buildComboBox.getItemAt(index));
+		ItemBuild build = new ItemBuild((String)buildComboBox.getItemAt(index), mode.getMapID(), mode.getModeID());
 		build.setAuthor(authorField.getText());
 		build.setType(typeField.getText());
 		build.setDescription(descriptionField.getText());
