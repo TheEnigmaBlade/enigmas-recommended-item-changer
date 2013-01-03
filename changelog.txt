@@ -1,3 +1,16 @@
+Version 3.2.0
+-------------
+* Added item build and item group customizable presets
+* Adding "allowany:1" to options.txt will enable the ability to edit recommended items for "Any" mode (disabled by default in version 3.1.0)
+* Reduced size of items in build area so 8 items are visible at once
+* Fixed some UI elements not being pretty enough
+* Other minor UI adjustments
+
+Version 3.1.1
+-------------
+* Fixed a bug preventing a new Champion's default items (Vi) from being loaded
+* Minor UI fixes
+
 Version 3.1.0
 -------------
 * Added default items (start-up time is slightly longer)

@@ -9,6 +9,7 @@ import javax.swing.border.*;
 
 import net.enigmablade.paradoxion.localization.*;
 import net.enigmablade.paradoxion.ui.models.*;
+import net.enigmablade.paradoxion.util.*;
 
 import net.enigmablade.lol.lollib.data.*;
 import net.enigmablade.lol.lollib.ui.pretty.*;
@@ -38,6 +39,7 @@ public class FavoritesDialog extends JDialog
 		setModalityType(ModalityType.APPLICATION_MODAL);
 		setModal(true);
 		setTitle("Set Favorite Champions");
+		setIconImage(ResourceLoader.getIcon());
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		addWindowListener(new WindowAdapter(){
 			@Override
@@ -88,7 +90,6 @@ public class FavoritesDialog extends JDialog
 		JScrollPane championsScrollPane = new JScrollPane();
 		championsScrollPane.setPreferredSize(new Dimension(0, 0));
 		championsScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		championsScrollPane.setVerticalScrollBar(new PrettyScrollBar(JScrollBar.VERTICAL));
 		GridBagConstraints gbc_championsScrollPane = new GridBagConstraints();
 		gbc_championsScrollPane.fill = GridBagConstraints.BOTH;
 		gbc_championsScrollPane.insets = new Insets(0, 0, 0, 6);
@@ -104,7 +105,6 @@ public class FavoritesDialog extends JDialog
 		JScrollPane favoritesScrollPane = new JScrollPane();
 		favoritesScrollPane.setPreferredSize(new Dimension(0, 0));
 		favoritesScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		favoritesScrollPane.setVerticalScrollBar(new PrettyScrollBar(JScrollBar.VERTICAL));
 		GridBagConstraints gbc_favoritesScrollPane = new GridBagConstraints();
 		gbc_favoritesScrollPane.fill = GridBagConstraints.BOTH;
 		gbc_favoritesScrollPane.gridx = 2;

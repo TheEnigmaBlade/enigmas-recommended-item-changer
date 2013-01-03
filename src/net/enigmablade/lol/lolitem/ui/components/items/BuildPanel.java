@@ -19,14 +19,14 @@ import net.enigmablade.lol.lolitem.ui.dnd.*;
 public class BuildPanel extends JPanel implements DragGestureListener
 {
 	private ArrayList<DraggableItem> items;
-	private int gap = 4;
+	private int gap = 2;
 	
 	private DragSource dragSource;
 	
 	private String emptyText = "Drag items here";
 	private Font emptyFont;
 	
-	private int itemSize = 42;
+	private int itemSize = 38;
 	
 	private ItemFilterModel itemFilterModel;
 	
@@ -34,13 +34,13 @@ public class BuildPanel extends JPanel implements DragGestureListener
 	{
 		this.itemFilterModel = itemFilterModel;
 		
-		setLayout(new FlowLayout(FlowLayout.LEFT, gap, gap));
+		setLayout(new FlowLayout(FlowLayout.CENTER, gap, gap));
 		//setBackground(new Color(194, 197, 203));
 		//setBackground(getBackground().darker());
 		setBackground(new Color(40, 40, 40));
 		setForeground(new Color(70, 70, 70));
 		
-		setBorder(new EmptyBorder(0, 12, 0, 12));
+		setBorder(new EmptyBorder(2, 2, 0, 0));
 		
 		emptyFont = getFont().deriveFont(16);
 		

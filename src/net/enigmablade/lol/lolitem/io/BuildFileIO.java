@@ -19,7 +19,7 @@ public class BuildFileIO
 	
 	public static boolean initDefaultItems(String uniqueName)
 	{
-		defaultItemsDir = RafUtil.extractPathsMatching(GamePathUtil.getDir().getFile(), uniqueName+"_DefaultItems", "^DATA/Characters/[A-za-z]+/Recommended/.*(DM|PG|SR|TT)\\.json$");
+		defaultItemsDir = RafUtil.extractPathsMatching(GamePathUtil.getDir().getFile(), uniqueName+"_DefaultItems", "^DATA/Characters/[A-za-z]+/Recommended/.*\\.json$");//(DM|PG|SR|TT)
 		return defaultItemsDir != null;
 	}
 	
@@ -37,7 +37,7 @@ public class BuildFileIO
 		if(defaultItemsDir != null)
 		{
 			List<ItemBuild> builds = loadBuilds(defaultItemsDir.getAbsolutePath()+"/DATA/Characters", champion, mode);
-			if(builds.size() > 1)
+			if(builds != null && builds.size() > 1)
 				writeToLog("Something isn't right, more than one default items file was found", 1, LoggingType.WARNING);
 			if(builds != null && builds.size() > 0)
 			{
@@ -88,9 +88,10 @@ public class BuildFileIO
 			return null;
 		}
 		
+		writeToLog("BuildIO # Builds loaded: "+builds.size(), 2, LoggingType.WARNING);
 		Collections.sort(builds);
 		
-		////////////////asdffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+		////////////////
 		
 		//Filter out build files to match the mode
 		//String buildFileBase = "EnigmaItem_"+mode.getMapID()+"_"+mode.getModeID();
@@ -119,7 +120,7 @@ public class BuildFileIO
 	
 	private static ItemBuild loadBuild(File file, Champion actualChampion, GameMode actualMode)
 	{
-		writeToLog("BuildIO # Loading build: "+file.getName(), 2);
+		writeToLog("BuildIO # Loading build: "+file.getName(), 3);
 		//Parse JSON
 		JSONParser parser = new JSONParser();
 		JSONObject root = null;
@@ -130,13 +131,13 @@ public class BuildFileIO
 		}
 		catch(IOException e)
 		{
-			writeToLog("Could not find JSON file", 3, LoggingType.ERROR);
+			writeToLog("Could not find JSON file", 4, LoggingType.ERROR);
 			writeStackTrace(e);
 			return null;
 		}
 		catch(ParseException e)
 		{
-			writeToLog("Could not parse JSON", 3, LoggingType.ERROR);
+			writeToLog("Could not parse JSON", 4, LoggingType.ERROR);
 			writeStackTrace(e);
 			return null;
 		}
@@ -257,12 +258,15 @@ public class BuildFileIO
 		}
 		
 		boolean bad = false;
-		if(bad |= !actualChampion.getKey().equals(champion))
+		if(actualChampion != null && (bad |= !actualChampion.getKey().equals(champion)))
 			writeToLog("Champion keys do not match: given \""+champion+"\", expected \""+actualChampion.getKey()+"\"", 3, LoggingType.WARNING);
-		if(bad |= !actualMode.getMapID().equals(mapID))
-			writeToLog("Map IDs do not match: given \""+mapID+"\", expected \""+actualMode.getMapID()+"\"", 3, LoggingType.WARNING);
-		if(bad |= !actualMode.getModeID().equals(modeID))
-			writeToLog("Mode IDs do not match: given \""+modeID+"\", expected \""+actualMode.getModeID()+"\"", 3, LoggingType.WARNING);
+		if(actualMode != null)
+		{
+			if(!"any".equals(mapID) && (bad |= !actualMode.getMapID().equals(mapID)))
+				writeToLog("Map IDs do not match: given \""+mapID+"\", expected \""+actualMode.getMapID()+"\"", 3, LoggingType.WARNING);
+			if(!"any".equals(mapID) && (bad |= !actualMode.getModeID().equals(modeID)))
+				writeToLog("Mode IDs do not match: given \""+modeID+"\", expected \""+actualMode.getModeID()+"\"", 3, LoggingType.WARNING);
+		}
 		if(bad)
 			return null;
 		
@@ -301,16 +305,19 @@ public class BuildFileIO
 		File[] buildFiles = baseDir.listFiles();
 		
 		//Filter out build files to match the mode
-		String buildFileBase = "EnigmaItem_"+mode.getMapID()+"_"+mode.getModeID();
-		writeToLog("BuildIO # Filtering build files with base: "+buildFileBase, 1);
+		writeToLog("BuildIO # Filtering build files", 1);
 		
 		List<File> filteredBuildFiles = new ArrayList<File>(buildFiles.length);
 		for(File buildFile : buildFiles)
-			if(buildFile.getName().startsWith(buildFileBase))
+		{
+			ItemBuild build = loadBuild(buildFile, null, null);
+			if(!"any".equals(build.getMap()) && mode.getMapID().equals(build.getMap()) && //If the file's map is not any and is equal to the build's map
+			   !"any".equals(build.getMode()) && mode.getModeID().equals(build.getMap())) //If the file's mode is not any and is equal to the build's mode
 			{
 				writeToLog("BuildIO # "+buildFile.getName(), 2);
 				filteredBuildFiles.add(buildFile);
 			}
+		}
 		
 		//Remove conflicting build files
 		if(filteredBuildFiles.size() != 0)
@@ -328,7 +335,7 @@ public class BuildFileIO
 			for(int n = 0; n < itemBuilds.size(); n++)
 			{
 				ItemBuild build = itemBuilds.get(n);
-				File buildFile = new File(baseDir.getAbsolutePath()+"/"+buildFileBase+"-"+n+".json");
+				File buildFile = new File(baseDir.getAbsolutePath()+"/"+"EnigmaItem_"+mode.getMapID()+"_"+mode.getModeID()+"-"+n+".json");
 				writeToLog("BuildIO # Saving to file: "+buildFile.getAbsolutePath(), 2);
 				SaveError newError = saveBuild(buildFile, champion, mode, build, n == primaryItemSet);
 				if(error == SaveError.NONE)

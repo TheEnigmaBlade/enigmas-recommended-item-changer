@@ -13,6 +13,7 @@ import net.enigmablade.lol.lollib.ui.*;
 import net.enigmablade.lol.lollib.ui.pretty.*;
 import net.enigmablade.lol.lollib.data.*;
 
+import net.enigmablade.lol.lolitem.*;
 import net.enigmablade.lol.lolitem.data.*;
 import net.enigmablade.lol.lolitem.data.filter.*;
 import net.enigmablade.lol.lolitem.ui.components.items.*;
@@ -27,13 +28,23 @@ public class ItemGroupPanel
 	
 	private EditableLabel nameLabel;
 	private JButton collapseButton;
+	private JButton actionsPopupButton;
 	private JButton removeButton;
 	
 	private JScrollPane contentScrollPane;
 	private BuildPanel content;
 	
-	public ItemGroupPanel(String name, ItemFilterModel itemFilterModel)
+	private int groupIndex = -1;
+	
+	private static JPopupMenu presetPopup;
+	private static int presetIndex = -1;
+	
+	//Initialization
+	
+	public ItemGroupPanel(String name, int index, ItemFilterModel itemFilterModel)
 	{
+		groupIndex = index;
+		
 		initComponents(itemFilterModel);
 		initActions();
 		
@@ -59,9 +70,9 @@ public class ItemGroupPanel
 			{
 				int adj = collapsiblePane.isCollapsed() ? 0 : 1;
 				g.setColor(UIUtil.COMPONENT_BASE);
-				g.fillRoundRect(0, 0, getWidth()-1, getHeight()-1+adj, 4, 4);
+				g.fillRoundRect(0, 0, getWidth()-1-4, getHeight()-1+adj, 4, 4);
 				g.setColor(UIUtil.COMPONENT_BORDER);
-				g.drawRoundRect(0, 0, getWidth()-1, getHeight()-1+adj, 4, 4);
+				g.drawRoundRect(0, 0, getWidth()-1-4, getHeight()-1+adj, 4, 4);
 			}
 		};
 		tabPanel.setBorder(new EmptyBorder(0, 0, 0, 4));
@@ -79,6 +90,12 @@ public class ItemGroupPanel
 		collapseButton.setBorder(null);
 		collapseButton.setPreferredSize(new Dimension(20, 20));
 		tabPanel.add(collapseButton, BorderLayout.WEST);
+		
+		actionsPopupButton = new PrettyButton("\u25bc");
+		actionsPopupButton.setFont(actionsPopupButton.getFont().deriveFont(6f));
+		actionsPopupButton.setPreferredSize(new Dimension(14, 20));
+		actionsPopupButton.setBorder(null);
+		tabPanel.add(actionsPopupButton, BorderLayout.EAST);
 		
 		JPanel shrinkingPanel = new JPanel();
 		shrinkingPanel.setLayout(new BorderLayout());
@@ -101,7 +118,6 @@ public class ItemGroupPanel
 		contentScrollPane = new JScrollPane();
 		contentScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		contentScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-		contentScrollPane.setVerticalScrollBar(new PrettyScrollBar(PrettyScrollBar.VERTICAL));
 		contentScrollPane.setPreferredSize(new Dimension(0, 100));
 		contentScrollPane.setBorder(new LineBorder(UIUtil.COMPONENT_BORDER, 1, false));
 		collapsiblePane.setContentPane(contentScrollPane);
@@ -125,7 +141,68 @@ public class ItemGroupPanel
 				collapseButton.setText(collapsiblePane.isCollapsed() ? "\u2212" : "+");
 			}
 		});
+		
+		actionsPopupButton.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent evt)
+			{
+				presetIndex = groupIndex;
+				presetPopup.show(actionsPopupButton, 0, actionsPopupButton.getHeight());
+			}
+		});
 	}
+	
+	public static void setupGroupPresets(List<String> presets, final EnigmaItems main)
+	{
+		writeToLog("ItemGroupPanel # Setting up presets");
+		
+		if(presetPopup == null)
+			presetPopup= new JPopupMenu();
+		else
+			presetPopup.removeAll();
+		
+		//Add presets
+		writeToLog("ItemGroupPanel # Adding presets", 1);
+		for(int n = 0; n < presets.size(); n++)
+		{
+			writeToLog(presets.get(n), 2);
+			JMenuItem i = new JMenuItem(presets.get(n));
+			i.setActionCommand(presets.get(n));
+			i.addActionListener(new ActionListener(){
+				@Override
+				public void actionPerformed(ActionEvent evt)
+				{
+					main.setGroupPreset(presetIndex, evt.getActionCommand());
+				}
+			});
+			presetPopup.add(i);
+		}
+		
+		//Add other
+		presetPopup.addSeparator();
+		
+		JMenuItem addPreset = new JMenuItem("Add as preset...");
+		addPreset.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent evt)
+			{
+				main.addGroupPreset(presetIndex);
+			}
+		});
+		presetPopup.add(addPreset);
+		
+		JMenuItem managePresets = new JMenuItem("Manage presets...");
+		managePresets.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent evt)
+			{
+				main.managePresets();
+			}
+		});
+		presetPopup.add(managePresets);
+	}
+	
+	//Accessor methods
 	
 	public Component[] getComponents()
 	{
@@ -157,10 +234,12 @@ public class ItemGroupPanel
 		removeButton.setActionCommand(index+"");
 	}
 	
-	//Accessor methods
+	//Data methods
 	
 	public void setItems(ItemGroup set)
 	{
+		content.removeAll();
+		
 		List<Item> items = set.getItems();
 		List<Integer> itemCounts = set.getItemCounts();
 		for(int n = 0; n < items.size(); n++)

@@ -35,6 +35,7 @@ public class AboutDialog extends JDialog
 		setModal(true);
 		setResizable(false);
 		setTitle("About");
+		setIconImage(ResourceLoader.getIcon());
 		
 		JPanel contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(2, 2, 2, 2));

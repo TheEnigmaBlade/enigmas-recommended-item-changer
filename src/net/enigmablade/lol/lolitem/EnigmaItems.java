@@ -26,12 +26,13 @@ import net.enigmablade.lol.lolitem.io.BuildFileIO.*;
 import net.enigmablade.lol.lolitem.ui.*;
 import net.enigmablade.lol.lolitem.ui.components.*;
 import net.enigmablade.lol.lolitem.ui.components.ItemBuildComboBox.*;
+import net.enigmablade.lol.lolitem.ui.dialogs.*;
 
 public class EnigmaItems
 {
 	public static final String appName = "Enigma's Recommended Item Changer";
 	public static final String appKey = "EnigmaItem";
-	public static final String version = "3.1.0", buildVersion = "2", versionAdd = "";
+	public static final String version = "3.2.0", buildVersion = "0", versionAdd = "";
 	
 	//UI
 	private MainUI ui;
@@ -54,6 +55,7 @@ public class EnigmaItems
 	
 	//Options
 	private Options options;
+	private PresetOptions presets;
 	
 	//Start-up
 	
@@ -117,6 +119,8 @@ public class EnigmaItems
 		
 		if(success)
 		{
+			initPresets();
+			
 			setChampion(null);
 			
 			long loadEndTime = System.nanoTime();
@@ -153,7 +157,8 @@ public class EnigmaItems
 		
 		DefaultComboBoxModel<GameMode> gameModeModel = new DefaultComboBoxModel<GameMode>();
 		for(GameMode mode : GameMode.values())
-			gameModeModel.addElement(mode);
+			if(mode != GameMode.ANY || options.allowAny)
+				gameModeModel.addElement(mode);
 		
 		ui.initModels(itemFilterModel, gameModeModel);
 		
@@ -174,6 +179,14 @@ public class EnigmaItems
 		
 		//Set some options
 		setItemDisplayMode(options.itemDisplayMode);
+	}
+	
+	private void initPresets()
+	{
+		presets = PresetOptions.loadPresets();
+		
+		ui.setupBuildPresets(presets.getBuildNames());
+		ui.setupGroupPresets(presets.getGroupNames());
 	}
 	
 	public void open()
@@ -362,6 +375,14 @@ public class EnigmaItems
 		}
 	}
 	
+	public void setBuildPreset(String presetName)
+	{
+		writeToLog("Setting build to preset "+presetName);
+		ItemBuild preset = presets.buildPresets.get(presetName);
+		writeToLog("Build: "+preset, 1);
+		ui.setBuild(preset);
+	}
+	
 	public void addBuildGroup()
 	{
 		writeToLog("Adding new build group");
@@ -375,6 +396,14 @@ public class EnigmaItems
 		writeToLog("Removing build group at index: "+index);
 		championBuilds.get(currentBuildIndex).removeGroup(index);
 		ui.removeBuildGroup(index);
+	}
+	
+	public void setGroupPreset(int groupIndex, String presetName)
+	{
+		writeToLog("Setting group "+groupIndex+" to preset "+presetName);
+		ItemGroup preset = presets.groupPresets.get(presetName);
+		writeToLog("Group: "+preset, 1);
+		ui.setBuildGroup(groupIndex, preset);
 	}
 	
 	public void save()
@@ -431,7 +460,7 @@ public class EnigmaItems
 				case UNKNOWN: errorText = "An unknown error has occured."; break;
 			}
 			writeToLog("Save error: error="+error+", text=\""+errorText+"\"");
-			ui.setSaveError(errorText);
+			ui.setSaveError(errorText, false);
 		}
 		ui.setSaveSuccess(success);
 	}
@@ -486,6 +515,17 @@ public class EnigmaItems
 		setItemDisplayMode(options.itemDisplayMode = options.itemDisplayMode.getNextMode());
 	}
 	
+	public void managePresets()
+	{
+		PresetOptions newPresets = PresetDialog.openDialog(ui, presets);
+		if(newPresets != null)
+		{
+			PresetOptions.savePresets(newPresets);
+			ui.setupBuildPresets(newPresets.getBuildNames());
+			ui.setupGroupPresets(newPresets.getGroupNames());
+		}
+	}
+	
 		//Menu methods
 	
 	public void importItemSets()
@@ -494,16 +534,6 @@ public class EnigmaItems
 	}
 	
 	public void exportItemSets()
-	{
-		//TODO
-	}
-	
-	public void exportCode()
-	{
-		//TODO
-	}
-	
-	public void importCode()
 	{
 		//TODO
 	}
@@ -660,7 +690,12 @@ public class EnigmaItems
 					ui.setBuilds(names);
 					ui.enableBuildEditing(true);
 					
-					loaded = true;
+					//loaded = true;
+				}
+				else
+				{
+					writeToLog("Failed to load default build", 1, LoggingType.ERROR);
+					ui.setSaveError("Failed to load default build", true);
 				}
 			}
 			
@@ -680,13 +715,17 @@ public class EnigmaItems
 			for(ItemBuild build : championBuilds)
 			{
 				writeToLog("Build: "+build.getName(), 2);
+				writeToLog("Author: "+build.getAuthor(), 3);
+				writeToLog("Type: "+build.getType(), 3);
 				for(ItemGroup group : build.getGroups())
 					writeToLog("Group: "+group.getName(), 3);
 				names.add(build.getName());
 			}
-			//currentBuild = 0;
+			
+			currentBuildIndex = -1;
+			oldBuildIndex = -1;
+			
 			ui.setBuilds(names);
-			//ui.setBuild(championBuilds.get(0));
 			ui.enableBuildEditing(true);
 		}
 	}
@@ -705,6 +744,80 @@ public class EnigmaItems
 				championBuilds.set(toIndex, build);
 			}
 		}
+	}
+	
+	public void setBuildPresets(List<ItemBuild> newPresets)
+	{
+		presets.buildPresets.clear();
+		
+		for(ItemBuild build : newPresets)
+			presets.buildPresets.put(build.getName(), build);
+		
+		PresetOptions.savePresets(presets);
+		
+		ui.setupBuildPresets(presets.getBuildNames());
+	}
+	
+	public void addBuildPreset()
+	{
+		writeToLog("Adding build preset");
+		ItemBuild build = ui.getBuild(currentBuildIndex, currentGameMode);
+		writeToLog("Build: "+build, 1);
+		
+		String name = null;
+		boolean exists = false;
+		do
+		{
+			name = JOptionPane.showInputDialog(ui, (exists ? "Name already exists.\n\n" : "")+"Input the name for the preset:", "Preset name?", JOptionPane.QUESTION_MESSAGE);
+			if(name == null)
+				return;
+		}while(exists = presets.buildPresets.containsKey(name));
+		writeToLog("Name: "+name, 1);
+		build.setName(name);
+		
+		writeToLog("Updating preset data", 1);
+		presets.buildPresets.put(build.getName(), build);
+		PresetOptions.savePresets(presets);
+		
+		writeToLog("Updating preset ui", 1);
+		ui.setupBuildPresets(presets.getBuildNames());
+	}
+	
+	public void setGroupPresets(List<ItemGroup> newPresets)
+	{
+		presets.groupPresets.clear();
+		
+		for(ItemGroup group : newPresets)
+			presets.groupPresets.put(group.getName(), group);
+		
+		PresetOptions.savePresets(presets);
+		
+		ui.setupGroupPresets(presets.getGroupNames());
+	}
+	
+	public void addGroupPreset(int groupIndex)
+	{
+		writeToLog("Adding group preset from index "+groupIndex);
+		ItemGroup group = ui.getBuildGroup(groupIndex);
+		writeToLog("Group: "+group, 1);
+		
+		String name = null;
+		boolean exists = false;
+		do
+		{
+			name = JOptionPane.showInputDialog(ui, (exists ? "Name already exists.\n\n" : "")+"Input the name for the preset:", "Preset name?", JOptionPane.QUESTION_MESSAGE);
+			if(name == null)
+				return;
+		}while(exists = presets.groupPresets.containsKey(name));
+		writeToLog("Name: "+name, 1);
+		group.setName(name);
+		
+		writeToLog("Updating preset data", 1);
+		presets.groupPresets.put(group.getName(), group);
+		PresetOptions.savePresets(presets);
+		
+		writeToLog("Updating preset ui", 1);
+		ui.setupGroupPresets(presets.getGroupNames());
 	}
 	
 	private void checkSave()

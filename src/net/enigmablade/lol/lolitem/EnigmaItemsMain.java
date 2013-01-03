@@ -54,6 +54,7 @@ public class EnigmaItemsMain
 		try
 		{
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			//UIManager.setLookAndFeel(new PrettyLookAndFeel());
 			//JFrame.setDefaultLookAndFeelDecorated(true);
 			
 			System.setProperty("apple.laf.useScreenMenuBar", "true");

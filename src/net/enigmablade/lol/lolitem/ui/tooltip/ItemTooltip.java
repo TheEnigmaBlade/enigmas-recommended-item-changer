@@ -53,21 +53,25 @@ public class ItemTooltip extends JToolTip
 		boolean isTwisted = item.hasProperty(ItemProperty.TWISTED_MODE);
 		boolean isDominion = item.hasProperty(ItemProperty.DOMINION_MODE);
 		boolean isAllMid = item.hasProperty(ItemProperty.ALL_MID_MODE);
-		String text = "Summoner's Rift only";
+		String text;
 		if(isClassic && isTwisted && isDominion && isAllMid)
 			text = "All game modes";
-		else if(isTwisted && isDominion)
-			text = "Twisted Treeline and Crystal Scar only";
-		else if(isTwisted && isAllMid)
-			text = "Twisted Treeline and Proving Grounds only";
-		else if(isDominion && isAllMid)
-			text = "Crystal Scar and Proving Grounds only";
-		else if(isTwisted)
-			text = "Twisted Treeline only";
-		else if(isDominion)
-			text = "Crystal Scar only";
-		else if(isAllMid)
-			text = "Proving Grounds only";
+		else if(isClassic && isTwisted && isAllMid)
+			text = "Summoner's Rift, Twisted Treeline, and Proving Grounds";
+		else if(isTwisted && isDominion && isAllMid)
+			text = "Twisted Treeline, Crystal Scar, and Proving Grounds";
+		else
+		{
+			text = "";
+			if(isClassic)
+				text += "Summoner's Rift ";
+			if(isTwisted)
+				text += (text.length() != 0 ? "and " : "")+"Twisted Treeline ";
+			if(isDominion)
+				text += (text.length() != 0 ? "and " : "")+"Crystal Scar ";
+			if(isAllMid)
+				text += (text.length() != 0 ? "and " : "")+"Proving Grounds ";
+		}
 		modeLabel.setText(text);
 	}
 	

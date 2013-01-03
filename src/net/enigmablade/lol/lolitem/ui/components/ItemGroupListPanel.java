@@ -21,19 +21,26 @@ public class ItemGroupListPanel extends JPanel
 	
 	private List<ItemGroupPanel> groupPanels;
 	
+	private boolean lockResize = false;
 	
 	public ItemGroupListPanel()
 	{
 		initComponents();
 	}
-	private void initComponents() {
-		listener = new ComponentAdapter(){
+	
+	private void initComponents()
+	{
+		/*listener = new ComponentAdapter(){
 			@Override
 			public void componentResized(ComponentEvent evt)
 			{
-				updateSize();
+				if(!lockResize)
+				{
+					System.out.println("Item group panel resized");
+					updateSize();
+				}
 			}
-		};
+		};*/
 		
 		setLayout(new FlowLayout(FlowLayout.CENTER, 0, 5));
 		
@@ -55,6 +62,8 @@ public class ItemGroupListPanel extends JPanel
 	
 	public void initActions(ActionListener addGroupListener, ActionListener removeGroupListener)
 	{
+		addComponentListener(listener);
+		
 		addGroupButton.addActionListener(addGroupListener);
 		removeListener = removeGroupListener;
 	}
@@ -118,13 +127,16 @@ public class ItemGroupListPanel extends JPanel
 	
 	//Helper methods
 	
-	private void updateSize()
+	public void updateSize()
 	{
+		//System.out.println("Updating size");
+		lockResize = true;
+		
 		int height = 0;
 		for(Component c : getComponents())
 		{
 			height += c.getHeight();
-			//c.setSize(getWidth(), c.getHeight());
+			c.setSize(getWidth()-10, c.getHeight());
 			if(c instanceof BuildPanel)
 				((BuildPanel)c).refreshPanel();
 		}
@@ -132,6 +144,8 @@ public class ItemGroupListPanel extends JPanel
 		
 		revalidate();
 		repaint();
+		
+		lockResize = false;
 	}
 	
 	//Accessor methods

@@ -7,6 +7,7 @@ import java.io.*;
 import java.util.*;
 import java.util.List;
 import javax.swing.*;
+import javax.swing.Timer;
 import javax.swing.border.*;
 import javax.swing.event.*;
 import javax.swing.text.*;
@@ -50,6 +51,8 @@ public class MainUI extends JFrame implements DragGestureListener
 	private boolean disableGameModeUpdate = false;
 	
 	//UI
+	private JSplitPane splitPane;
+	
 	private ChampionImagePanel championImagePanel;
 	private JLabel championNameLabel, championTitleLabel;
 	private ChampionComboBox championComboBox;
@@ -57,7 +60,9 @@ public class MainUI extends JFrame implements DragGestureListener
 	
 	private ItemBuildComboBox buildComboBox;
 	private JButton buildAddButton, buildRemoveButton;
+	private JButton buildAddMoreButton;
 	
+	private JPanel buildPanel;
 	private JButton buildInfoButton;
 	private JXCollapsiblePane extraInfoCollapsiblePane;
 	private JTextField authorField, typeField;
@@ -82,10 +87,12 @@ public class MainUI extends JFrame implements DragGestureListener
 	private JCheckBox critCheckBox, consumeCheckBox;
 	private ArrayList<JCheckBox> filterCheckBoxes;
 	
+	private JPopupMenu buildAddMorePopup;
+	
 	//Menu bar
 	private JMenu fileMenu, buildMenu, optionsMenu, helpMenu;
 	
-	private JMenuItem importMenuItem, exportMenuItem, copyCodeMenuItem, getCodeMenuItem, openFolderMenuItem, exitMenuItem;
+	private JMenuItem importMenuItem, exportMenuItem, openFolderMenuItem, exitMenuItem;
 	private JMenuItem newBuildMenuItem, duplicateBuildMenuItem, saveBuildMenuItem, copyBuildMenuItem, clearBuildMenuItem, resetBuildMenuItem, resetDefaultsBuildMenuItem;
 	private JCheckBoxMenuItem updateStartupMenuItem, enableTooltipsMenuItem, useDefaultsMenuItem, backupEnableMenuItem, minimizeTrayMenuItem;
 	private JMenuItem updateProgramMenuItem, updateCacheMenuItem, manualPathMenuItem, editFavoritesMenuItem, backupRestoreMenuItem;
@@ -131,7 +138,7 @@ public class MainUI extends JFrame implements DragGestureListener
 		ToolTipManager.sharedInstance().setReshowDelay(500);
 		ToolTipManager.sharedInstance().setDismissDelay(Integer.MAX_VALUE);
 		
-		PrettyLAF.initLAF();
+		PrettyLookAndFeel.initLAF();
 	}
 	
 	private void initMenuBar()
@@ -157,22 +164,6 @@ public class MainUI extends JFrame implements DragGestureListener
 		exportMenuItem.setMnemonic('e');
 		fileMenu.add(exportMenuItem);
 		exportMenuItem.setEnabled(false);
-		
-		fileMenu.addSeparator();
-		
-		copyCodeMenuItem = new JMenuItem("Copy code to clipboard");
-		copyCodeMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_MASK));
-		copyCodeMenuItem.setMnemonic('c');
-		copyCodeMenuItem.setIcon(ResourceLoader.getImageIcon("menu_icons/copy.png"));
-		fileMenu.add(copyCodeMenuItem);
-		copyCodeMenuItem.setEnabled(false);
-		
-		getCodeMenuItem = new JMenuItem("Paste code from clipboard");
-		getCodeMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_MASK));
-		getCodeMenuItem.setMnemonic('p');
-		getCodeMenuItem.setIcon(ResourceLoader.getImageIcon("menu_icons/paste.png"));
-		fileMenu.add(getCodeMenuItem);
-		getCodeMenuItem.setEnabled(false);
 		
 		fileMenu.addSeparator();
 		
@@ -419,20 +410,6 @@ public class MainUI extends JFrame implements DragGestureListener
 			public void actionPerformed(ActionEvent evt)
 			{
 				main.exportItemSets();
-			}
-		});
-		copyCodeMenuItem.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent evt)
-			{
-				main.exportCode();
-			}
-		});
-		getCodeMenuItem.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent evt)
-			{
-				main.importCode();
 			}
 		});
 		openFolderMenuItem.addActionListener(new ActionListener(){
@@ -752,10 +729,31 @@ public class MainUI extends JFrame implements DragGestureListener
 		
 		contentPane.setLayout(new BorderLayout(2, 2));
 		
+		JPanel separator = new JPanel();
+		FlowLayout flowLayout = (FlowLayout) separator.getLayout();
+		flowLayout.setVgap(1);
+		flowLayout.setHgap(0);
+		separator.setBackground(UIUtil.COMPONENT_BASE);
+		separator.setPreferredSize(new Dimension(0, 4));
+		GridBagConstraints gbc_separator = new GridBagConstraints();
+		gbc_separator.fill = GridBagConstraints.BOTH;
+		gbc_separator.gridwidth = 4;
+		gbc_separator.gridx = 0;
+		gbc_separator.gridy = 2;
+		
+		ButtonGroup sortButtonGroup = new ButtonGroup();
+		
+		filterCheckBoxes = new ArrayList<JCheckBox>();
+		
+		splitPane = new InvisibleSplitPane();
+		splitPane.setEnabled(false);
+		contentPane.add(splitPane, BorderLayout.CENTER);
+		
 		JPanel sidePanel = new JPanel();
+		splitPane.setLeftComponent(sidePanel);
+		sidePanel.setMinimumSize(new Dimension(230, 0));
 		sidePanel.setOpaque(false);
 		sidePanel.setPreferredSize(new Dimension(230, 0));
-		contentPane.add(sidePanel, BorderLayout.WEST);
 		sidePanel.setLayout(new BorderLayout(0, 3));
 		
 		JPanel championPanel = new PrettyPanel();
@@ -839,12 +837,12 @@ public class MainUI extends JFrame implements DragGestureListener
 		gbc_comboBox_2.gridy = 3;
 		championInfoPanel.add(gameModeComboBox, gbc_comboBox_2);
 		
-		JPanel buildPanel = new PrettyPanel();
+		buildPanel = new PrettyPanel();
 		sidePanel.add(buildPanel, BorderLayout.CENTER);
 		GridBagLayout gbl_buildPanel = new GridBagLayout();
-		gbl_buildPanel.columnWidths = new int[]{0, 0, 0, 0, 0};
-		gbl_buildPanel.rowHeights = new int[]{0, 0, 0, 0};
-		gbl_buildPanel.columnWeights = new double[]{0.0, 1.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_buildPanel.columnWidths = new int[]{0, 0, 0, 0, 12, 0};
+		gbl_buildPanel.rowHeights = new int[]{22, 0, 0, 0};
+		gbl_buildPanel.columnWeights = new double[]{0.0, 1.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		gbl_buildPanel.rowWeights = new double[]{0.0, 0.0, 1.0, Double.MIN_VALUE};
 		buildPanel.setLayout(gbl_buildPanel);
 		
@@ -853,7 +851,7 @@ public class MainUI extends JFrame implements DragGestureListener
 		buildInfoButton.setMinimumSize(new Dimension(34, 22));
 		buildInfoButton.setOpaque(false);
 		buildInfoButton.setFocusPainted(false);
-		buildInfoButton.setPreferredSize(new Dimension(34, 22));
+		buildInfoButton.setPreferredSize(new Dimension(30, 22));
 		buildInfoButton.setBorder(null);
 		GridBagConstraints gbc_buildInfoButton = new GridBagConstraints();
 		gbc_buildInfoButton.insets = new Insets(0, 0, 2, 2);
@@ -882,7 +880,7 @@ public class MainUI extends JFrame implements DragGestureListener
 		gbc_buildRemoveButton.gridy = 0;
 		buildPanel.add(buildRemoveButton, gbc_buildRemoveButton);
 		
-		buildAddButton = new PrettyButton("+");
+		buildAddButton = new PrettySideButton("+", true, true, true, false);
 		//buildAddButton.setToolTipText("Add a new item build");
 		buildAddButton.setMinimumSize(new Dimension(22, 22));
 		buildAddButton.setOpaque(false);
@@ -901,6 +899,19 @@ public class MainUI extends JFrame implements DragGestureListener
 		JPanel extraInfoCollapsibleContentPane = new JPanel();
 		extraInfoCollapsibleContentPane.setBorder(new EmptyBorder(0, 2, 0, 0));
 		extraInfoCollapsibleContentPane.setBackground(UIUtil.BACKGROUND);
+		
+		buildAddMoreButton = new PrettySideButton("\u25bc", true, true, false, true);
+		buildAddMoreButton.setFont(buildAddMoreButton.getFont().deriveFont(6f));
+		buildAddMoreButton.setFocusPainted(false);
+		buildAddMoreButton.setMinimumSize(new Dimension(10, 22));
+		buildAddMoreButton.setPreferredSize(new Dimension(10, 22));
+		buildAddMoreButton.setBorder(null);
+		GridBagConstraints gbc_btnV = new GridBagConstraints();
+		gbc_btnV.insets = new Insets(0, 0, 2, 0);
+		gbc_btnV.fill = GridBagConstraints.HORIZONTAL;
+		gbc_btnV.gridx = 4;
+		gbc_btnV.gridy = 0;
+		buildPanel.add(buildAddMoreButton, gbc_btnV);
 		extraInfoCollapsiblePane.setContentPane(extraInfoCollapsibleContentPane);
 		extraInfoCollapsiblePane.setBackground(UIUtil.BACKGROUND);
 		GridBagConstraints gbc_extraInfoCollapsiblePane = new GridBagConstraints();
@@ -926,9 +937,7 @@ public class MainUI extends JFrame implements DragGestureListener
 		gbc_authorLabel.gridy = 0;
 		extraInfoCollapsibleContentPane.add(authorLabel, gbc_authorLabel);
 		
-		authorField = new JTextField();
-		authorField.setBorder(new LineBorder(UIUtil.BORDER));
-		authorField.setCaretColor(UIUtil.FOREGROUND);
+		authorField = new PrettyTextField();
 		GridBagConstraints gbc_authorField = new GridBagConstraints();
 		gbc_authorField.insets = new Insets(0, 0, 2, 0);
 		gbc_authorField.fill = GridBagConstraints.HORIZONTAL;
@@ -945,9 +954,7 @@ public class MainUI extends JFrame implements DragGestureListener
 		gbc_typeLabel.gridy = 1;
 		extraInfoCollapsibleContentPane.add(typeLabel, gbc_typeLabel);
 		
-		typeField = new JTextField();
-		typeField.setBorder(new LineBorder(UIUtil.BORDER));
-		typeField.setCaretColor(UIUtil.FOREGROUND);
+		typeField = new PrettyTextField();
 		GridBagConstraints gbc_typeField = new GridBagConstraints();
 		gbc_typeField.insets = new Insets(0, 0, 2, 0);
 		gbc_typeField.fill = GridBagConstraints.HORIZONTAL;
@@ -967,10 +974,8 @@ public class MainUI extends JFrame implements DragGestureListener
 		JScrollPane descriptionScrollPane = new JScrollPane();
 		descriptionScrollPane.setBorder(new LineBorder(UIUtil.BORDER));
 		descriptionScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		JScrollBar bar = new PrettyScrollBar(JScrollBar.VERTICAL);
-		bar.setUnitIncrement(4);
-		bar.setBlockIncrement(8);
-		descriptionScrollPane.setVerticalScrollBar(bar);
+		descriptionScrollPane.getVerticalScrollBar().setUnitIncrement(4);
+		descriptionScrollPane.getVerticalScrollBar().setBlockIncrement(8);
 		descriptionScrollPane.setPreferredSize(new Dimension(0, 44));
 		GridBagConstraints gbc_descriptionScrollPane = new GridBagConstraints();
 		gbc_descriptionScrollPane.fill = GridBagConstraints.BOTH;
@@ -978,37 +983,22 @@ public class MainUI extends JFrame implements DragGestureListener
 		gbc_descriptionScrollPane.gridy = 2;
 		extraInfoCollapsibleContentPane.add(descriptionScrollPane, gbc_descriptionScrollPane);
 		
-		descriptionField = new JTextArea();
-		descriptionField.setCaretColor(UIUtil.FOREGROUND);
+		descriptionField = new PrettyTextArea();
 		descriptionField.setLineWrap(true);
 		descriptionField.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		descriptionScrollPane.setViewportView(descriptionField);
-		
-		JPanel separator = new JPanel();
-		FlowLayout flowLayout = (FlowLayout) separator.getLayout();
-		flowLayout.setVgap(1);
-		flowLayout.setHgap(0);
-		separator.setBackground(UIUtil.COMPONENT_BASE);
-		separator.setPreferredSize(new Dimension(0, 4));
-		GridBagConstraints gbc_separator = new GridBagConstraints();
-		gbc_separator.fill = GridBagConstraints.BOTH;
-		gbc_separator.gridwidth = 4;
-		gbc_separator.gridx = 0;
-		gbc_separator.gridy = 2;
 		//buildPanel.add(separator, gbc_separator);
 		
 		JScrollPane buildGroupScrollPane = new JScrollPane();
 		buildGroupScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		buildGroupScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		JScrollBar bar2 = new PrettyScrollBar(JScrollBar.VERTICAL);
-		bar2.setUnitIncrement(16);
-		bar2.setBlockIncrement(32);
-		buildGroupScrollPane.setVerticalScrollBar(bar2);
+		buildGroupScrollPane.getVerticalScrollBar().setUnitIncrement(16);
+		buildGroupScrollPane.getVerticalScrollBar().setBlockIncrement(32);
 		buildGroupScrollPane.setOpaque(false);
 		buildGroupScrollPane.getViewport().setOpaque(false);
 		buildGroupScrollPane.setBorder(null);
 		GridBagConstraints gbc_buildGroupScrollPane = new GridBagConstraints();
-		gbc_buildGroupScrollPane.gridwidth = 4;
+		gbc_buildGroupScrollPane.gridwidth = 5;
 		gbc_buildGroupScrollPane.fill = GridBagConstraints.BOTH;
 		gbc_buildGroupScrollPane.gridx = 0;
 		gbc_buildGroupScrollPane.gridy = 2;
@@ -1064,8 +1054,8 @@ public class MainUI extends JFrame implements DragGestureListener
 		controlPanel.add(saveResponseCollapsiblePane, BorderLayout.NORTH);
 		
 		JPanel contentPanel = new JPanel();
+		splitPane.setRightComponent(contentPanel);
 		contentPanel.setOpaque(false);
-		contentPane.add(contentPanel, BorderLayout.CENTER);
 		contentPanel.setLayout(new BorderLayout(0, 3));
 		
 		JPanel filtersPanel = new PrettyPanel();
@@ -1109,8 +1099,6 @@ public class MainUI extends JFrame implements DragGestureListener
 		gbc_sortDescendingRadioButton.gridx = 0;
 		gbc_sortDescendingRadioButton.gridy = 1;
 		sortPanel.add(sortDescendingRadioButton, gbc_sortDescendingRadioButton);
-		
-		ButtonGroup sortButtonGroup = new ButtonGroup();
 		sortButtonGroup.add(sortAscendingRadioButton);
 		sortButtonGroup.add(sortDescendingRadioButton);
 		
@@ -1124,8 +1112,6 @@ public class MainUI extends JFrame implements DragGestureListener
 		gbc_sortComboBox.gridx = 0;
 		gbc_sortComboBox.gridy = 3;
 		sortPanel.add(sortComboBox, gbc_sortComboBox);
-		
-		filterCheckBoxes = new ArrayList<JCheckBox>();
 		
 		adCheckBox = new PrettyCheckBox("Attack Damage");
 		adCheckBox.setActionCommand(ItemProperty.ATTACK_DAMAGE.name());
@@ -1226,14 +1212,14 @@ public class MainUI extends JFrame implements DragGestureListener
 		gbc_mCheckBox.gridy = 2;
 		filtersPanel.add(mCheckBox, gbc_mCheckBox);
 		
-		tenCheckBox = new PrettyCheckBox("Tenacity");
-		tenCheckBox.setActionCommand(ItemProperty.TENACITY.name());
-		filterCheckBoxes.add(tenCheckBox);
-		GridBagConstraints gbc_tenCheckBox = new GridBagConstraints();
-		gbc_tenCheckBox.anchor = GridBagConstraints.WEST;
-		gbc_tenCheckBox.gridx = 4;
-		gbc_tenCheckBox.gridy = 2;
-		filtersPanel.add(tenCheckBox, gbc_tenCheckBox);
+		mvCheckBox = new PrettyCheckBox("Movement");
+		mvCheckBox.setActionCommand(ItemProperty.MOVEMENT.name());
+		filterCheckBoxes.add(mvCheckBox);
+		GridBagConstraints gbc_mvCheckBox = new GridBagConstraints();
+		gbc_mvCheckBox.anchor = GridBagConstraints.WEST;
+		gbc_mvCheckBox.gridx = 4;
+		gbc_mvCheckBox.gridy = 2;
+		filtersPanel.add(mvCheckBox, gbc_mvCheckBox);
 		
 		arPenCheckBox = new PrettyCheckBox("Armor Pen");
 		arPenCheckBox.setActionCommand(ItemProperty.ARMOR_PEN.name());
@@ -1262,14 +1248,14 @@ public class MainUI extends JFrame implements DragGestureListener
 		gbc_mRegenCheckBox.gridy = 3;
 		filtersPanel.add(mRegenCheckBox, gbc_mRegenCheckBox);
 		
-		mvCheckBox = new PrettyCheckBox("Movement");
-		mvCheckBox.setActionCommand(ItemProperty.MOVEMENT.name());
-		filterCheckBoxes.add(mvCheckBox);
-		GridBagConstraints gbc_mvCheckBox = new GridBagConstraints();
-		gbc_mvCheckBox.anchor = GridBagConstraints.WEST;
-		gbc_mvCheckBox.gridx = 4;
-		gbc_mvCheckBox.gridy = 3;
-		filtersPanel.add(mvCheckBox, gbc_mvCheckBox);
+		consumeCheckBox = new PrettyCheckBox("Consumable");
+		consumeCheckBox.setActionCommand(ItemProperty.CONSUMABLE.name());
+		filterCheckBoxes.add(consumeCheckBox);
+		GridBagConstraints gbc_consumeCheckBox = new GridBagConstraints();
+		gbc_consumeCheckBox.anchor = GridBagConstraints.WEST;
+		gbc_consumeCheckBox.gridx = 4;
+		gbc_consumeCheckBox.gridy = 3;
+		filtersPanel.add(consumeCheckBox, gbc_consumeCheckBox);
 		
 		critCheckBox = new PrettyCheckBox("Critical Chance");
 		critCheckBox.setActionCommand(ItemProperty.CRITICAL.name());
@@ -1280,23 +1266,21 @@ public class MainUI extends JFrame implements DragGestureListener
 		gbc_critCheckBox.gridy = 4;
 		filtersPanel.add(critCheckBox, gbc_critCheckBox);
 		
-		consumeCheckBox = new PrettyCheckBox("Consumable");
-		consumeCheckBox.setActionCommand(ItemProperty.CONSUMABLE.name());
-		filterCheckBoxes.add(consumeCheckBox);
-		GridBagConstraints gbc_consumeCheckBox = new GridBagConstraints();
-		gbc_consumeCheckBox.anchor = GridBagConstraints.WEST;
-		gbc_consumeCheckBox.gridx = 3;
-		gbc_consumeCheckBox.gridy = 4;
-		filtersPanel.add(consumeCheckBox, gbc_consumeCheckBox);
+		tenCheckBox = new PrettyCheckBox("Tenacity");
+		tenCheckBox.setActionCommand(ItemProperty.TENACITY.name());
+		filterCheckBoxes.add(tenCheckBox);
+		GridBagConstraints gbc_tenCheckBox = new GridBagConstraints();
+		gbc_tenCheckBox.anchor = GridBagConstraints.WEST;
+		gbc_tenCheckBox.gridx = 3;
+		gbc_tenCheckBox.gridy = 4;
+		filtersPanel.add(tenCheckBox, gbc_tenCheckBox);
 		
 		draggableItemsScrollPane = new JScrollPane();
 		draggableItemsScrollPane.setBorder(new LineBorder(UIUtil.BORDER));
 		draggableItemsScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		draggableItemsScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		JScrollBar bar3 = new PrettyScrollBar(JScrollBar.VERTICAL);
-		bar3.setUnitIncrement(16);
-		bar3.setBlockIncrement(32);
-		draggableItemsScrollPane.setVerticalScrollBar(bar3);
+		draggableItemsScrollPane.getVerticalScrollBar().setUnitIncrement(16);
+		draggableItemsScrollPane.getVerticalScrollBar().setBlockIncrement(32);
 		draggableItemsScrollPane.setOpaque(false);
 		draggableItemsScrollPane.getViewport().setOpaque(false);
 		contentPanel.add(draggableItemsScrollPane, BorderLayout.CENTER);
@@ -1362,11 +1346,26 @@ public class MainUI extends JFrame implements DragGestureListener
 		});
 		
 		//Item build box
+		/*buildPanel.addComponentListener(new ComponentAdapter(){
+			@Override
+			public void componentResized(ComponentEvent e)
+			{
+				System.out.println("Build panel resized");
+				buildGroupList.updateSize();
+			}
+		});*/
 		buildAddButton.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent evt)
 			{
 				main.addBuild(null);
+			}
+		});
+		buildAddMoreButton.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent evt)
+			{
+				buildAddMorePopup.show(buildAddMoreButton, 0, buildAddMoreButton.getHeight());
 			}
 		});
 		buildRemoveButton.addActionListener(new ActionListener(){
@@ -1556,6 +1555,61 @@ public class MainUI extends JFrame implements DragGestureListener
 		//TODO
 	}
 	
+	public void setupBuildPresets(List<String> presets)
+	{
+		writeToLog("MainUI # Setting up build presets");
+		
+		if(buildAddMorePopup == null)
+			buildAddMorePopup= new JPopupMenu();
+		else
+			buildAddMorePopup.removeAll();
+		
+		//Add presets
+		writeToLog("MainUI # Adding presets", 1);
+		for(int n = 0; n < presets.size(); n++)
+		{
+			writeToLog(presets.get(n), 2);
+			JMenuItem i = new JMenuItem(presets.get(n));
+			i.setActionCommand(presets.get(n));
+			i.addActionListener(new ActionListener(){
+				@Override
+				public void actionPerformed(ActionEvent evt)
+				{
+					main.setBuildPreset(evt.getActionCommand());
+				}
+			});
+			buildAddMorePopup.add(i);
+		}
+		
+		//Add other
+		buildAddMorePopup.addSeparator();
+		
+		JMenuItem addPreset = new JMenuItem("Add as preset...");
+		addPreset.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent evt)
+			{
+				main.addBuildPreset();
+			}
+		});
+		buildAddMorePopup.add(addPreset);
+		
+		JMenuItem managePresets = new JMenuItem("Manage presets...");
+		managePresets.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent evt)
+			{
+				main.managePresets();
+			}
+		});
+		buildAddMorePopup.add(managePresets);
+	}
+	
+	public void setupGroupPresets(List<String> presets)
+	{
+		ItemGroupPanel.setupGroupPresets(presets, main);
+	}
+	
 	//Data
 	
 	public void setChampions(List<String> favorites, List<String> remaining)
@@ -1646,7 +1700,7 @@ public class MainUI extends JFrame implements DragGestureListener
 	public void addBuildGroup(ItemGroup group)
 	{
 		writeToLog("UI # Adding build group: "+group.getName());
-		ItemGroupPanel panel = new ItemGroupPanel(group.getName(), itemFilterModel);
+		ItemGroupPanel panel = new ItemGroupPanel(group.getName(), buildGroupList.getGroups().size(), itemFilterModel);
 		panel.setItems(group);
 		buildGroupList.addGroup(panel);
 	}
@@ -1655,6 +1709,11 @@ public class MainUI extends JFrame implements DragGestureListener
 	{
 		writeToLog("UI # Removing build group at index: "+index);
 		buildGroupList.removeGroup(index);
+	}
+	
+	public ItemGroup getBuildGroup(int index)
+	{
+		return buildGroupList.getGroups().get(index).getItems();
 	}
 	
 	//GUI methods
@@ -1695,19 +1754,21 @@ public class MainUI extends JFrame implements DragGestureListener
 			descriptionField.setText(build.getDescription());
 			
 			writeToLog("UI # Adding build groups", 1);
-			for(ItemGroup set : build.getGroups())
+			for(int n = 0; n < build.getGroups().size(); n++)
 			{
-				writeToLog(set.getName(), 2);
-				ItemGroupPanel group = new ItemGroupPanel(set.getName(), itemFilterModel);
-				buildGroupList.addGroup(group);
+				ItemGroup group = build.getGroups().get(n);
+				writeToLog(group.getName(), 2);
 				
-				group.refreshPanel();
-				buildGroupList.revalidate();
-				buildGroupList.repaint();
-				group.refreshPanel();
+				ItemGroupPanel groupPanel = new ItemGroupPanel(group.getName(), n, itemFilterModel);
+				buildGroupList.addGroup(groupPanel);
 				
-				group.setItems(set);
-				group.refreshPanel();
+				//groupPanel.refreshPanel();
+				//buildGroupList.revalidate();
+				//buildGroupList.repaint();
+				//groupPanel.refreshPanel();
+				
+				groupPanel.setItems(group);
+				groupPanel.refreshPanel();
 			}
 		}
 		else
@@ -1727,6 +1788,13 @@ public class MainUI extends JFrame implements DragGestureListener
 			panel.refreshPanel();
 	}
 	
+	public void setBuildGroup(int index, ItemGroup group)
+	{
+		ItemGroupPanel panel = buildGroupList.getGroups().get(index);
+		panel.setItems(group);
+		panel.refreshPanel();
+	}
+	
 	public void setSaveSuccess(boolean success)
 	{
 		saveButton.setSuccess(success);
@@ -1734,10 +1802,28 @@ public class MainUI extends JFrame implements DragGestureListener
 			saveResponseCollapsiblePane.setCollapsed(true);
 	}
 	
-	public void setSaveError(String errorText)
+	public void setSaveError(String errorText, boolean autoClose)
 	{
 		saveResponseLabel.setText(errorText);
 		saveResponseCollapsiblePane.setCollapsed(false);
+		
+		if(autoClose)
+		{
+			Timer timer = new Timer(1500, new ActionListener(){
+				@Override
+				public void actionPerformed(ActionEvent evt)
+				{
+					SwingUtilities.invokeLater(new Thread(){
+						public void run()
+						{
+							saveResponseCollapsiblePane.setCollapsed(true);
+						}
+					});
+				}
+			});
+			timer.setRepeats(false);
+			timer.start();
+		}
 	}
 	
 	public void setItemDisplayMode(ItemDisplayMode mode)
@@ -1829,6 +1915,7 @@ public class MainUI extends JFrame implements DragGestureListener
 			buildRemoveButton.setEnabled(false);
 		}
 		buildAddButton.setEnabled(enable);
+		buildAddMoreButton.setEnabled(enable);
 		
 		saveButton.setEnabled(enable);
 		

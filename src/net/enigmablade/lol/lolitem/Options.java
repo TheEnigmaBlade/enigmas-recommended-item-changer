@@ -8,8 +8,6 @@ import net.enigmablade.lol.lollib.io.*;
 
 import static net.enigmablade.paradoxion.util.Logger.*;
 
-
-
 public class Options
 {
 	private static final File file = new File("options.txt");
@@ -34,13 +32,15 @@ public class Options
 	public boolean minimizeToTray = false;
 	public boolean systemTrayEnabled = false;
 	
+	public boolean allowAny = false;
+	
 	public boolean changeMade;
 	public boolean showSaveWarning = true;
 	public int saveDefault = JOptionPane.YES_OPTION;
 	
 	public boolean firstStartup = false;
 	
-	public Options()
+	private Options()
 	{
 		lolDirHistory = new ArrayDeque<GamePath>();
 		favoriteChampions = new ArrayList<String>();
@@ -140,19 +140,10 @@ public class Options
 					for(String s : favs)
 						o.favoriteChampions.add(s);
 				}
-				else if(key.equals("globalitems"))
+				else if(key.equals("allowany"))
 				{
-					String[] setStrings = value.split(";");
-					for(String setString : setStrings)
-					{
-						//String name = setString.substring(0, setString.indexOf(':'));
-						String[] itemStrings = setString.substring(setString.indexOf(':'+1)).split(",");
-						//ItemSet set = new ItemSet(name);
-						for(int n = 0; n < itemStrings.length; n++)
-						{
-							//TODO
-						}
-					}
+					int bool = Integer.parseInt(value);
+					o.allowAny = bool == 1;
 				}
 			}
 		}

@@ -8,6 +8,7 @@ import javax.swing.*;
 import javax.swing.border.*;
 
 import net.enigmablade.paradoxion.localization.*;
+import net.enigmablade.paradoxion.util.*;
 
 import net.enigmablade.lol.lollib.ui.pretty.*;
 
@@ -31,7 +32,9 @@ public class ChangelogDialog extends JDialog
 		setModalityType(ModalityType.APPLICATION_MODAL);
 		setModal(true);
 		setTitle("Changelog");
+		setIconImage(ResourceLoader.getIcon());
 		setBounds(0, 0, 625, 475);
+		
 		JPanel contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(2, 2, 2, 2));
 		contentPane.setLayout(new BorderLayout());
@@ -55,11 +58,15 @@ public class ChangelogDialog extends JDialog
 		getRootPane().setDefaultButton(closeButton);
 		
 		JScrollPane textScrollPane = new JScrollPane();
+		textScrollPane.getVerticalScrollBar().setUnitIncrement(32);
+		textScrollPane.getVerticalScrollBar().setBlockIncrement(64);
+		textScrollPane.getHorizontalScrollBar().setUnitIncrement(32);
+		textScrollPane.getHorizontalScrollBar().setBlockIncrement(64);
 		contentPane.add(textScrollPane, BorderLayout.CENTER);
 		
 		JTextArea textArea = new JTextArea();
 		textArea.setEditable(false);
-		textArea.setForeground(Color.black);
+		//textArea.setForeground(Color.black);
 		String text = "";
 		try
 		{
