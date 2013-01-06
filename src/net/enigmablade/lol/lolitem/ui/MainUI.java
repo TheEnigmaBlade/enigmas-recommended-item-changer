@@ -97,7 +97,7 @@ public class MainUI extends JFrame implements DragGestureListener
 	private JMenu fileMenu, buildMenu, optionsMenu, helpMenu;
 	
 	private JMenuItem importMenuItem, exportMenuItem, openFolderMenuItem, exitMenuItem;
-	private JMenuItem newBuildMenuItem, duplicateBuildMenuItem, saveBuildMenuItem, copyBuildMenuItem, clearBuildMenuItem, resetBuildMenuItem, resetDefaultsBuildMenuItem;
+	private JMenuItem newBuildMenuItem, duplicateBuildMenuItem, saveBuildMenuItem, copyBuildMenuItem, clearBuildMenuItem, resetBuildMenuItem, resetDefaultsBuildMenuItem, ultimateBraveryMenuItem;
 	private JCheckBoxMenuItem updateStartupMenuItem, enableTooltipsMenuItem, useDefaultsMenuItem, backupEnableMenuItem, minimizeTrayMenuItem;
 	private JMenuItem updateProgramMenuItem, updateCacheMenuItem, manualPathMenuItem, editFavoritesMenuItem, backupRestoreMenuItem;
 	private JMenu updateMenu, backupMenu, itemDisplayModeMenu, languageMenu, tooltipsMenu, imageSizeMenu;
@@ -238,6 +238,12 @@ public class MainUI extends JFrame implements DragGestureListener
 		buildMenu.add(resetDefaultsBuildMenuItem);
 		resetDefaultsBuildMenuItem.setEnabled(false);
 		
+		buildMenu.addSeparator();
+		
+		ultimateBraveryMenuItem = new JMenuItem("Ultimate Bravery");
+		//ultimateBraveryMenuItem.setIcon(ResourceLoader.getImageIcon("brave.png"));
+		buildMenu.add(ultimateBraveryMenuItem);
+		
 		//Options menu
 		optionsMenu = new JMenu(" Options ");
 		optionsMenu.setMnemonic('o');
@@ -261,7 +267,7 @@ public class MainUI extends JFrame implements DragGestureListener
 		updateMenu.add(updateCacheMenuItem);
 		
 		backupMenu = new JMenu("Backup");
-		//TODO: optionsMenu.add(backupMenu);
+		//optionsMenu.add(backupMenu);
 		
 		backupEnableMenuItem = new JCheckBoxMenuItem("Enable automatic backup");
 		backupMenu.add(backupEnableMenuItem);
@@ -501,6 +507,13 @@ public class MainUI extends JFrame implements DragGestureListener
 			public void actionPerformed(ActionEvent evt)
 			{
 				main.resetToDefaults();
+			}
+		});
+		ultimateBraveryMenuItem.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent evt)
+			{
+				main.ultimateBravery();
 			}
 		});
 		updateStartupMenuItem.addItemListener(new ItemListener(){
@@ -1801,11 +1814,20 @@ public class MainUI extends JFrame implements DragGestureListener
 		
 		enableBuildEditing(build != null);
 		
-		buildGroupList.revalidate();
-		buildGroupList.repaint();
-		
-		for(ItemGroupPanel panel : buildGroupList.getGroups())
-			panel.refreshPanel();
+		SwingUtilities.invokeLater(new Runnable(){
+			@Override
+			public void run()
+			{
+				buildGroupList.revalidate();
+				buildGroupList.repaint();
+				
+				for(ItemGroupPanel panel : buildGroupList.getGroups())
+					panel.refreshPanel();
+				
+				buildGroupList.revalidate();
+				buildGroupList.repaint();
+			}
+		});
 	}
 	
 	public void setBuildGroup(int index, ItemGroup group)

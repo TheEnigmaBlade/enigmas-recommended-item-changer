@@ -595,6 +595,78 @@ public class EnigmaItems
 		ToolTipManager.sharedInstance().setEnabled(enabled);
 	}
 	
+	public void ultimateBravery()
+	{
+		int result = JOptionPane.showConfirmDialog(ui, "Only those who are brave may play Ultimate Bravery.\nARE YOU BRAVE ENOUGH?", "SO BRAVE", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, ResourceLoader.getImageIcon("brave-m.png"));
+		if(result == JOptionPane.YES_OPTION)
+		{
+			writeToLog("THE USER IS SO BRAVE");
+			
+			//Random Champion
+			Set<String> championKeys = ChampionDatabase.getChampions();
+			String championKey = championKeys.toArray(new String[championKeys.size()])[(int)(Math.random()*championKeys.size())];
+			Champion champion = ChampionDatabase.getChampion(championKey);
+			setChampion(champion);
+			setGameMode(GameMode.CLASSIC);
+			
+			//Setup items
+			ItemBuild build = new ItemBuild("Ultimate Bravery", currentGameMode.getMapID(), currentGameMode.getModeID());
+			
+			//Random items
+			List<String> boots = Arrays.asList(new String[]{
+					"3254", "3259", "3264", "3269", "3274", "3279", "3284",
+					"3251", "3256", "3261", "3266", "3271", "3276", "3281",
+					"3253", "3258", "3263", "3268", "3273", "3278", "3283",
+					"3252", "3257", "3262", "3267", "3272", "3277", "3282",
+					"3250", "3255", "3260", "3265", "3270", "3275", "3280"
+				});
+			List<String> exclude = Arrays.asList(new String[]{
+					"3006", "3117", "3009", "3047", "3111", "3158", "3020", //Non-enchanted boots
+					"3198", "3197", "3196", //Viktor augments
+					"3166" //Rengar's item
+				});
+			
+			ItemGroup items = new ItemGroup("ULTIMATE BRAVERY");
+				//Boots
+			items.addItem(ItemDatabase.getItem(boots.get((int)(Math.random()*boots.size()))), 1);
+				//Other 5
+			String[] itemIDs = ItemDatabase.getItems().toArray(new String[0]);
+			List<Item> pickedItems = new ArrayList<Item>(6);
+			for(int n = 0; n < 5; n++)
+			{
+				String pickedID;
+				Item picked;
+				do
+				{
+					picked = ItemDatabase.getItem(pickedID = itemIDs[(int)(Math.random()*itemIDs.length)]);
+				}while(picked.getEpicness() == 0 || boots.contains(pickedID) || exclude.contains(pickedID) || pickedItems.contains(picked));
+				pickedItems.add(picked);
+				items.addItem(picked, 1);
+			}
+			
+			build.addGroup(items);
+			
+			//Consumables
+			ItemGroup consumables = new ItemGroup("FOR THE WEAK");
+			consumables.addItem(ItemDatabase.getItem("2003"), 1);
+			consumables.addItem(ItemDatabase.getItem("2004"), 1);
+			consumables.addItem(ItemDatabase.getItem("2044"), 1);
+			consumables.addItem(ItemDatabase.getItem("2043"), 1);
+			//consumables.addItem(ItemDatabase.getItem("2042"), 1);
+			build.addGroup(consumables);
+			
+			//If no item sets are loaded, create a new list and remove the default text from the combobox
+			if(championBuilds == null)
+			{
+				writeToLog("List is empty, creating", 1);
+				championBuilds = new ArrayList<ItemBuild>();
+				//ui.clearBuilds();
+			}
+			championBuilds.add(build);
+			ui.addBuild("Ultimate Bravery");
+		}
+	}
+	
 	//Data methods
 	
 	private boolean loadItems()
