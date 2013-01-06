@@ -20,8 +20,8 @@ public class PresetOptions
 	
 	public PresetOptions()
 	{
-		buildPresets = new HashMap<String, ItemBuild>();
-		groupPresets = new HashMap<String, ItemGroup>();
+		buildPresets = new LinkedHashMap<String, ItemBuild>();
+		groupPresets = new LinkedHashMap<String, ItemGroup>();
 	}
 	
 	public static PresetOptions loadPresets()
@@ -193,7 +193,7 @@ public class PresetOptions
 		List<String> names = new ArrayList<String>(buildPresets.size());
 		for(String name : buildPresets.keySet())
 			names.add(name);
-		Collections.sort(names);
+		//Collections.sort(names);
 		return names;
 	}
 	
@@ -202,7 +202,7 @@ public class PresetOptions
 		List<String> names = new ArrayList<String>(groupPresets.size());
 		for(String name : groupPresets.keySet())
 			names.add(name);
-		Collections.sort(names);
+		//Collections.sort(names);
 		return names;
 	}
 }

@@ -32,7 +32,7 @@ public class EnigmaItems
 {
 	public static final String appName = "Enigma's Recommended Item Changer";
 	public static final String appKey = "EnigmaItem";
-	public static final String version = "3.2.0", buildVersion = "0", versionAdd = "";
+	public static final String version = "3.2.0", buildVersion = "0", versionAdd = "beta";
 	
 	//UI
 	private MainUI ui;
@@ -149,7 +149,6 @@ public class EnigmaItems
 			public void stateChanged(ChangeEvent evt)
 			{
 				Object source = evt.getSource();
-				System.out.println("Related item filter changed");
 				boolean show = source != ItemFilterModel.ITEM_CLEARED;
 				ui.setShowRelatedItemReturn(show);
 			}
@@ -380,6 +379,7 @@ public class EnigmaItems
 		writeToLog("Setting build to preset "+presetName);
 		ItemBuild preset = presets.buildPresets.get(presetName);
 		writeToLog("Build: "+preset, 1);
+		championBuilds.get(currentBuildIndex).setBuild(preset);
 		ui.setBuild(preset);
 	}
 	
@@ -396,6 +396,12 @@ public class EnigmaItems
 		writeToLog("Removing build group at index: "+index);
 		championBuilds.get(currentBuildIndex).removeGroup(index);
 		ui.removeBuildGroup(index);
+	}
+	
+	public void swapBuildGroups(int index1, int index2)
+	{
+		writeToLog("Swapping build groups "+index1+" and "+index2);
+		ui.swapBuildGroups(index1, index2);
 	}
 	
 	public void setGroupPreset(int groupIndex, String presetName)
@@ -523,6 +529,7 @@ public class EnigmaItems
 			PresetOptions.savePresets(newPresets);
 			ui.setupBuildPresets(newPresets.getBuildNames());
 			ui.setupGroupPresets(newPresets.getGroupNames());
+			presets = newPresets;
 		}
 	}
 	
@@ -584,7 +591,8 @@ public class EnigmaItems
 	
 	public void setTooltipsEnabled(boolean enabled)
 	{
-		//TODO
+		options.tooltipsEnabled = enabled;
+		ToolTipManager.sharedInstance().setEnabled(enabled);
 	}
 	
 	//Data methods
@@ -649,21 +657,29 @@ public class EnigmaItems
 	
 	public void rebuildChampionsList()
 	{
-		ArrayList<String> remaining = new ArrayList<String>(allChampions);
+		List<String> remaining = new ArrayList<String>(allChampions);
+		List<String> favoriteNames = new ArrayList<String>(options.favoriteChampions.size());
 		
 		//Add favorites
 		if(options.favoriteChampions.size() > 0)
 		{
-			Collections.sort(options.favoriteChampions);
-			for(String name : options.favoriteChampions)
+			
+			for(String key : options.favoriteChampions)
+			{
+				Champion champ = ChampionDatabase.getChampion(key);
+				if(champ == null)
+					champ = ChampionDatabase.getChampion(ChampionDatabase.getChampionKey(key));
+				if(champ != null)
+					favoriteNames.add(champ.getName());
+			}
+			
+			Collections.sort(favoriteNames);
+			for(String name : favoriteNames)
 				remaining.remove(name);
 		}
 		
 		//Add all champions
-		ui.setChampions(options.favoriteChampions, remaining);
-		
-		//Required dialogs
-		//CopyBuildDialog.initChampions(allChampions);
+		ui.setChampions(favoriteNames, remaining);
 	}
 	
 	public void loadChampionBuilds()

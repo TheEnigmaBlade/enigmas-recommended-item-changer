@@ -21,7 +21,7 @@ public class ItemGroupListPanel extends JPanel
 	
 	private List<ItemGroupPanel> groupPanels;
 	
-	private boolean lockResize = false;
+	//private boolean lockResize = false;
 	
 	public ItemGroupListPanel()
 	{
@@ -80,6 +80,7 @@ public class ItemGroupListPanel extends JPanel
 		}
 		group.addComponentListener(listener);
 		group.addRemoveListener(removeListener);
+		System.out.println("old="+group.getIndex()+", new="+groupPanels.size());
 		group.setIndex(groupPanels.size());
 		
 		groupPanels.add(group);
@@ -119,10 +120,19 @@ public class ItemGroupListPanel extends JPanel
 		}
 		
 		add(addGroupButton);
-		//add(addDefaultGroupButton);
 		add(spacer);
 		
 		updateSize();
+	}
+	
+	public void swapGroups(int index1, int index2)
+	{
+		List<ItemGroupPanel> tempList = new LinkedList<ItemGroupPanel>(groupPanels);
+		removeAllGroups();
+		
+		Collections.swap(tempList, index1, index2);
+		for(ItemGroupPanel group : tempList)
+			addGroup(group);
 	}
 	
 	//Helper methods
@@ -130,7 +140,7 @@ public class ItemGroupListPanel extends JPanel
 	public void updateSize()
 	{
 		//System.out.println("Updating size");
-		lockResize = true;
+		//lockResize = true;
 		
 		int height = 0;
 		for(Component c : getComponents())
@@ -145,7 +155,7 @@ public class ItemGroupListPanel extends JPanel
 		revalidate();
 		repaint();
 		
-		lockResize = false;
+		//lockResize = false;
 	}
 	
 	//Accessor methods

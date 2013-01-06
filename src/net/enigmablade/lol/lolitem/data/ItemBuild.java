@@ -23,6 +23,8 @@ public class ItemBuild implements Comparable<ItemBuild>
 	public ItemBuild(String name, String map, String mode, List<ItemGroup> itemSets)
 	{
 		this.name = name;
+		this.map = map;
+		this.mode = mode;
 		this.itemSets = itemSets;
 		
 		description = "";
@@ -30,6 +32,22 @@ public class ItemBuild implements Comparable<ItemBuild>
 		type = "custom";
 		
 		isPriority = false;
+	}
+	
+	public void setBuild(ItemBuild build)
+	{
+		setName(build.getName());
+		setDescription(build.getDescription());
+		setAuthor(build.getAuthor());
+		setType(build.getType());
+		setPriority(build.isPriority());
+		
+		map = build.map;
+		mode = build.mode;
+		
+		itemSets = new ArrayList<ItemGroup>(build.itemSets.size());
+		for(ItemGroup group : build.itemSets)
+			itemSets.add(group.clone());
 	}
 	
 	public void setName(String name)

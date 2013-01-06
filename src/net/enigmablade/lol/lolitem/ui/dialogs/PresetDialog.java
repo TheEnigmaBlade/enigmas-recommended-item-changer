@@ -3,13 +3,16 @@ package net.enigmablade.lol.lolitem.ui.dialogs;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import java.util.List;
 import javax.swing.*;
 import javax.swing.border.*;
+import javax.swing.event.*;
 
 import net.enigmablade.paradoxion.util.*;
 import net.enigmablade.lol.lollib.ui.pretty.*;
 import net.enigmablade.lol.lolitem.*;
 import net.enigmablade.lol.lolitem.data.*;
+import net.enigmablade.lol.lolitem.ui.models.*;
 import net.enigmablade.lol.lolitem.ui.renderers.*;
 
 public class PresetDialog extends JDialog
@@ -20,8 +23,8 @@ public class PresetDialog extends JDialog
 	private JButton buildUpButton, buildDownButton, buildRenameButton, buildRemoveButton;
 	private JButton saveButton, cancelButton;
 	
-	private DefaultListModel<ItemBuild> buildListModel;
-	private DefaultListModel<ItemGroup> groupListModel;
+	private MovableListModel<ItemBuild> buildListModel;
+	private MovableListModel<ItemGroup> groupListModel;
 	
 	private boolean canceled = false;
 	
@@ -120,7 +123,8 @@ public class PresetDialog extends JDialog
 			@Override
 			public void actionPerformed(ActionEvent evt)
 			{
-				//TODO
+				int[] newSelections = buildListModel.moveUp(buildList.getSelectedIndices());
+				buildList.setSelectedIndices(newSelections);
 			}
 		});
 		GridBagConstraints gbc_buildUpButton = new GridBagConstraints();
@@ -135,7 +139,8 @@ public class PresetDialog extends JDialog
 			@Override
 			public void actionPerformed(ActionEvent evt)
 			{
-				//TODO
+				int[] newSelections = buildListModel.moveDown(buildList.getSelectedIndices());
+				buildList.setSelectedIndices(newSelections);
 			}
 		});
 		GridBagConstraints gbc_buildDownButton = new GridBagConstraints();
@@ -172,7 +177,9 @@ public class PresetDialog extends JDialog
 			@Override
 			public void actionPerformed(ActionEvent evt)
 			{
-				//TODO
+				List<ItemBuild> selected = buildList.getSelectedValuesList();
+				for(ItemBuild group : selected)
+					buildListModel.removeElement(group);
 			}
 		});
 		GridBagConstraints gbc_buildRemoveButton = new GridBagConstraints();
@@ -185,8 +192,19 @@ public class PresetDialog extends JDialog
 		buildPanel.add(buildScrollPane);
 		
 		buildList = new JList<ItemBuild>();
-		buildList.setModel(buildListModel = new DefaultListModel<ItemBuild>());
+		buildList.setModel(buildListModel = new MovableListModel<ItemBuild>());
 		buildList.setCellRenderer(new PresetBuildListCellRenderer());
+		buildList.addListSelectionListener(new ListSelectionListener(){
+			@Override
+			public void valueChanged(ListSelectionEvent evt)
+			{
+				int n = buildList.getSelectedIndices().length;
+				buildUpButton.setEnabled(n > 0);
+				buildDownButton.setEnabled(n > 0);
+				buildRenameButton.setEnabled(n == 1);
+				buildDownButton.setEnabled(n > 0);
+			}
+		});
 		buildScrollPane.setViewportView(buildList);
 		
 		JPanel groupPanel = new PrettyPanel();
@@ -216,7 +234,8 @@ public class PresetDialog extends JDialog
 			@Override
 			public void actionPerformed(ActionEvent evt)
 			{
-				//TODO
+				int[] newSelections = groupListModel.moveUp(groupList.getSelectedIndices());
+				groupList.setSelectedIndices(newSelections);
 			}
 		});
 		GridBagConstraints gbc_groupUpButton = new GridBagConstraints();
@@ -231,7 +250,8 @@ public class PresetDialog extends JDialog
 			@Override
 			public void actionPerformed(ActionEvent evt)
 			{
-				//TODO
+				int[] newSelections = groupListModel.moveDown(groupList.getSelectedIndices());
+				groupList.setSelectedIndices(newSelections);
 			}
 		});
 		GridBagConstraints gbc_groupDownButton = new GridBagConstraints();
@@ -268,7 +288,9 @@ public class PresetDialog extends JDialog
 			@Override
 			public void actionPerformed(ActionEvent evt)
 			{
-				//TODO
+				List<ItemGroup> selected = groupList.getSelectedValuesList();
+				for(ItemGroup group : selected)
+					groupListModel.removeElement(group);
 			}
 		});
 		GridBagConstraints gbc_groupRemoveButton = new GridBagConstraints();
@@ -281,8 +303,19 @@ public class PresetDialog extends JDialog
 		groupPanel.add(groupScrollPane);
 		
 		groupList = new JList<ItemGroup>();
-		groupList.setModel(groupListModel = new DefaultListModel<ItemGroup>());
+		groupList.setModel(groupListModel = new MovableListModel<ItemGroup>());
 		groupList.setCellRenderer(new PresetGroupListCellRenderer());
+		groupList.addListSelectionListener(new ListSelectionListener(){
+			@Override
+			public void valueChanged(ListSelectionEvent evt)
+			{
+				int n = groupList.getSelectedIndices().length;
+				groupUpButton.setEnabled(n > 0);
+				groupDownButton.setEnabled(n > 0);
+				groupRenameButton.setEnabled(n == 1);
+				groupDownButton.setEnabled(n > 0);
+			}
+		});
 		groupScrollPane.setViewportView(groupList);
 	}
 	

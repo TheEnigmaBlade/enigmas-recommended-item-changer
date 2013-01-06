@@ -15,6 +15,12 @@
 	<property name="dropbox_release" value="C:/Users/EnigmaBlade/Dropbox/Public/Software/EnigmaItem/release" />
 	<property name="dropbox_update" value="C:/Users/EnigmaBlade/Dropbox/Public/Software/EnigmaItem/update" />
 	
+	<target name="check_ftp">
+		<condition property="use_ftp">
+			<equals arg1="${ftp.enabled}" arg2="true"/>
+		</condition>
+	</target>
+	
 	<!-- Create jar -->
 	<target name="create_jar">
 		<copy file="${lollib}" todir="lib" />
@@ -51,6 +57,7 @@
 	
 	<!-- Create native executables -->
 	<target name="create_native">
+		<!-- Create wrapper config -->
 		<echoxml file="launch4j/launch4jconfig.xml">
 			<launch4jConfig>
 			  <dontWrapJar>false</dontWrapJar>
@@ -87,138 +94,57 @@
 			  </versionInfo>
 			</launch4jConfig>
 		</echoxml>
-		<echoxml file="launch4j/launch4jconfig_basicinstaller.xml">
-			<launch4jConfig>
-			  <dontWrapJar>false</dontWrapJar>
-			  <headerType>gui</headerType>
-			  <jar>..\export\jar\URL_Installer.jar</jar>
-			  <outfile>..\export\Association Installer.exe</outfile>
-			  <errTitle></errTitle>
-			  <cmdLine></cmdLine>
-			  <chdir></chdir>
-			  <priority>normal</priority>
-			  <downloadUrl>http://www.oracle.com/technetwork/java/javase/downloads/java-se-jre-7-download-432155.html</downloadUrl>
-			  <supportUrl></supportUrl>
-			  <customProcName>false</customProcName>
-			  <stayAlive>false</stayAlive>
-			  <manifest></manifest>
-			  <icon></icon>
-			  <jre>
-			    <path></path>
-			    <minVersion>1.6.0</minVersion>
-			    <maxVersion></maxVersion>
-			    <jdkPreference>preferJre</jdkPreference>
-			  </jre>
-			  <versionInfo>
-			    <fileVersion>${installer_version}.0</fileVersion>
-			    <txtFileVersion>${installer_version}</txtFileVersion>
-			    <fileDescription>Enigma&apos;s Recommended Item Changer URL Association Installer</fileDescription>
-			    <copyright>TheEnigmaBlade</copyright>
-			    <productVersion>${installer_version}.0</productVersion>
-			    <txtProductVersion>${installer_version}</txtProductVersion>
-			    <productName>ERIC Association Installer</productName>
-			    <companyName>TheEnigmaBlade</companyName>
-			    <internalName>ERIC URL Association Installer</internalName>
-			    <originalFilename>Association Installer.exe</originalFilename>
-			  </versionInfo>
-			</launch4jConfig>
-		</echoxml>
 		
+		<!-- Create wrapped exe -->
 		<taskdef name="launch4j" classname="net.sf.launch4j.ant.Launch4jTask" classpath="${launch4j_dir}/launch4j.jar:${launch4j_dir}/lib/xstream.jar" />
 		<launch4j configFile="launch4j/launch4jconfig.xml" />
-		<!--<launch4j configFile="launch4j/launch4jconfig_basicinstaller.xml" />-->
 	</target>
 	
 	<!-- Create distribution archives -->
 	<target name="create_zip">
 		<mkdir dir="export/dist" />
 		
-		<!--<copy file="changelog.txt" todir="export" />-->
+		<!-- Copy required files -->
 		<copy file="license.txt" todir="export"	/>
 		<copy file="changelog.txt" todir="export" />
 		<copy file="cache.dat" todir="export" />
 		<copy file="Updater.exe" todir="export" />
 		
+		<!-- Create archives -->
 		<zip destfile="export/dist/${dist_name}_${version}.zip" basedir="export" excludes="jar/**,dist/**" />
 		<zip destfile="export/dist/update_package.zip" basedir="export" excludes="jar/**,dist/**,license.txt" />
-		
-		<!--
-		<jar destfile="export/jar/Installer.jar">
-			<manifest>
-				<attribute name="Built-By" value="Enigma" />
-				<attribute name="Implementation-Version" value="${installer_version}" />
-				<attribute name="Built-Date" value="${date}" />
-				<attribute name="Main-Class" value="enigma.installer.InstallerMain" />
-			</manifest>
-			<fileset dir="bin" includes="enigma/installer/**,bin/resources/installer/**" excludes="enigma/installer/BasicInstallerMain.class" />
-			<fileset dir="bin/resources/images" includes="icon.png,backgrounds/bg1.jpg,backgrounds/bg2.jpg,backgrounds/bg3.jpg" />
-			<fileset dir="export" excludes="jar/**,dist/**" />
-		</jar>
-		
-		<echoxml file="launch4j/launch4jconfig_installer.xml">
-			<launch4jConfig>
-			  <dontWrapJar>false</dontWrapJar>
-			  <headerType>gui</headerType>
-			  <jar>..\export\jar\Installer.jar</jar>
-			  <outfile>..\export\dist\Enigma_Item_Changer_${version}_installer.exe</outfile>
-			  <errTitle></errTitle>
-			  <cmdLine></cmdLine>
-			  <chdir></chdir>
-			  <priority>normal</priority>
-			  <downloadUrl>http://www.oracle.com/technetwork/java/javase/downloads/java-se-jre-7-download-432155.html</downloadUrl>
-			  <supportUrl></supportUrl>
-			  <customProcName>false</customProcName>
-			  <stayAlive>false</stayAlive>
-			  <manifest></manifest>
-			  <icon>..\resource-dev\images\icon\icon.ico</icon>
-			  <jre>
-			    <path></path>
-			    <minVersion>1.6.0</minVersion>
-			    <maxVersion></maxVersion>
-			    <jdkPreference>preferJre</jdkPreference>
-			  </jre>
-			  <versionInfo>
-			    <fileVersion>${installer_version}.0</fileVersion>
-			    <txtFileVersion>${installer_version}</txtFileVersion>
-			    <fileDescription>Enigma&apos;s Recommended Item Changer Installer</fileDescription>
-			    <copyright>TheEnigmaBlade</copyright>
-			    <productVersion>${version}.${build}</productVersion>
-			    <txtProductVersion>${version}</txtProductVersion>
-			    <productName>ERIC Installer</productName>
-			    <companyName>TheEnigmaBlade</companyName>
-			    <internalName>ERIC Installer</internalName>
-			    <originalFilename>Enigma_Item_Changer_${version}_installer.exe</originalFilename>
-			  </versionInfo>
-			</launch4jConfig>
-		</echoxml>
-		<launch4j configFile="launch4j/launch4jconfig_installer.xml" />
-		-->
 	</target>
 	
 	<!-- Copy distribution archives to dropbox -->
 	<target name="distribute">
 		<copy file="export/dist/${dist_name}_${version}.zip" todir="${dropbox_release}" />
-		<!--<copy file="export/dist/${dist_name}_${version}_installer.exe" todir="${dropbox_release}" />-->
-		
+	</target>
+	
+	<!-- Upload distribution archives to webserver -->
+	<target name="distribute_ftp" depends="check_ftp" if="use_ftp">
 		<ftp server="${ftp.server}" userid="${ftp.user}" password="${ftp.password}" remotedir="${ftp.dir}/downloads/lol-item-changer" binary="yes" verbose="true" passive="yes" >
 			<fileset dir="export/dist/">
 				<include name="${dist_name}_${version}.zip" />
-				<!--<include name="${dist_name}_${version}_installer.zip" />-->
 			</fileset>
 		</ftp>
 	</target>
 	
+	<!-- Copy update archives and information to dropbox -->
 	<target name="distribute_update">
 		<echo file="export/dist/version.txt">${version}.${build}</echo>
 		
 		<copy file="export/dist/version.txt" todir="${dropbox_update}" />
 		<copy file="export/dist/update_package.zip" todir="${dropbox_update}" />
 		<copy file="changelog.txt" todir="${dropbox_release}" />
-		
+	</target>
+	
+	<!-- Upload update archives and information to webserver -->
+	<target name="distribute_update_ftp" depends="check_ftp" if="use_ftp">
 		<ftp server="${ftp.server}" userid="${ftp.user}" password="${ftp.password}" remotedir="${ftp.dir}/updates/EnigmaItem" binary="yes" verbose="true" passive="yes" >
 			<fileset dir="export/dist/">
-				<include name="version.txt" />
 				<include name="update_package.zip" />
+				<include name="changelog.txt" />
+				<include name="version.txt" />
 			</fileset>
 		</ftp>
 	</target>
@@ -228,8 +154,13 @@
 		<zip destfile="export/dist/${dist_name}_${version}_src.zip" basedir="." excludes="todo.txt,export/**,dev tools/**,resource-dev/**,Backgrounds/**,logs/**" />
 	</target>
 	
-	<!-- Copy distribution archive to dropbox -->
+	<!-- Copy source distribution archive to dropbox -->
 	<target name="distribute_src">
+		<copy file="export/dist/${dist_name}_${version}_src.zip" todir="${dropbox_release}" />
+	</target>
+	
+	<!-- Upload source distribution archive to webserver -->
+	<target name="distribute_src_ftp" depends="check_ftp" if="use_ftp">
 		<copy file="export/dist/${dist_name}_${version}_src.zip" todir="${dropbox_release}" />
 	</target>
 	

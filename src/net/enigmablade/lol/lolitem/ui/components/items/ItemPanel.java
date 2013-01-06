@@ -4,8 +4,6 @@ import javax.swing.*;
 import net.enigmablade.lol.lolitem.ui.tooltip.*;
 import net.enigmablade.lol.lollib.data.*;
 
-
-
 public class ItemPanel extends JPanel
 {
 	protected Item item;

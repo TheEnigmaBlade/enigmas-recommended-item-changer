@@ -13,6 +13,8 @@ import javax.swing.event.*;
 import javax.swing.text.*;
 import org.jdesktop.swingx.*;
 import org.jdesktop.swingx.JXCollapsiblePane.*;
+import org.jdesktop.swingx.painter.*;
+import org.jdesktop.swingx.painter.effects.*;
 
 import net.enigmablade.paradoxion.localization.*;
 import net.enigmablade.paradoxion.ui.*;
@@ -30,10 +32,12 @@ import net.enigmablade.lol.lolitem.*;
 import net.enigmablade.lol.lolitem.data.*;
 import net.enigmablade.lol.lolitem.data.filter.*;
 import net.enigmablade.lol.lolitem.ui.components.*;
+import net.enigmablade.lol.lolitem.ui.components.ItemGroupPanel.DraggableEditableLabel;
 import net.enigmablade.lol.lolitem.ui.components.items.*;
 import net.enigmablade.lol.lolitem.ui.dialogs.*;
 import net.enigmablade.lol.lolitem.ui.dnd.*;
 import net.enigmablade.lol.lolitem.ui.models.*;
+import org.jdesktop.swingx.JXLabel.TextAlignment;
 
 public class MainUI extends JFrame implements DragGestureListener
 {
@@ -54,7 +58,7 @@ public class MainUI extends JFrame implements DragGestureListener
 	private JSplitPane splitPane;
 	
 	private ChampionImagePanel championImagePanel;
-	private JLabel championNameLabel, championTitleLabel;
+	private JXLabel championNameLabel, championTitleLabel;
 	private ChampionComboBox championComboBox;
 	private GameModeComboBox gameModeComboBox;
 	
@@ -108,6 +112,8 @@ public class MainUI extends JFrame implements DragGestureListener
 	private DraggableItemContainerModel draggableItemModel;
 	private ItemFilterModel itemFilterModel;
 	
+	private DragSource dragSource;
+	
 	//Initialization
 	
 	public MainUI(EnigmaItems m, Options o)
@@ -139,6 +145,8 @@ public class MainUI extends JFrame implements DragGestureListener
 		ToolTipManager.sharedInstance().setDismissDelay(Integer.MAX_VALUE);
 		
 		PrettyLookAndFeel.initLAF();
+		
+		dragSource = new DragSource();
 	}
 	
 	private void initMenuBar()
@@ -788,29 +796,33 @@ public class MainUI extends JFrame implements DragGestureListener
 		gbl_championInfoPanel.rowWeights = new double[]{1.0, 1.0, 0.0, 0.0, Double.MIN_VALUE};
 		championInfoPanel.setLayout(gbl_championInfoPanel);
 		
-		championNameLabel = new JLabel(){
-			@Override
-			public void paintComponent(Graphics g)
-			{
-				Graphics2D g2 = (Graphics2D)g;
-				g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-				g2.setFont(getFont());
-				g2.setColor(getBackground());
-				g2.drawString(getText(), 1, getFont().getSize()+1);
-				g2.setColor(getForeground());
-				g2.drawString(getText(), 0, getFont().getSize());
-			}
-		};
+		championNameLabel = new JXLabel();
+		championNameLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		championNameLabel.setFont(championNameLabel.getFont().deriveFont(championNameLabel.getFont().getStyle() | Font.BOLD, championNameLabel.getFont().getSize() + 3f));
 		GridBagConstraints gbc_championLabel = new GridBagConstraints();
 		gbc_championLabel.anchor = GridBagConstraints.SOUTH;
+		gbc_championLabel.fill = GridBagConstraints.HORIZONTAL;
 		gbc_championLabel.gridx = 0;
 		gbc_championLabel.gridy = 0;
 		championInfoPanel.add(championNameLabel, gbc_championLabel);
 		
-		championTitleLabel = new JLabel();
+		TextPainter championNamePainter = new TextPainter();
+		championNamePainter.setFont(championNameLabel.getFont());
+		championNamePainter.setAntialiasing(true);
+		championNamePainter.setFillHorizontal(false);
+		ShadowPathEffect shadow = new ShadowPathEffect();
+		shadow.setEffectWidth(6);
+		shadow.setBrushColor(UIUtil.scale(UIUtil.FOREGROUND, 0.2f));
+		shadow.setOffset(new Point(0, 0));
+		championNamePainter.setAreaEffects(shadow);
+		//championNameLabel.setBackgroundPainter(championNamePainter);
+		
+		championTitleLabel = new JXLabel();
+		championTitleLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		championTitleLabel.setTextAlignment(TextAlignment.CENTER);
 		GridBagConstraints gbc_championSubtitleLabel = new GridBagConstraints();
 		gbc_championSubtitleLabel.anchor = GridBagConstraints.NORTH;
+		gbc_championSubtitleLabel.fill = GridBagConstraints.HORIZONTAL;
 		gbc_championSubtitleLabel.gridx = 0;
 		gbc_championSubtitleLabel.gridy = 1;
 		championInfoPanel.add(championTitleLabel, gbc_championSubtitleLabel);
@@ -1564,6 +1576,13 @@ public class MainUI extends JFrame implements DragGestureListener
 		else
 			buildAddMorePopup.removeAll();
 		
+		//Add header
+		JMenuItem header = new JMenuItem("Presets");
+		header.setEnabled(false);
+		buildAddMorePopup.add(header);
+		
+		buildAddMorePopup.addSeparator();
+		
 		//Add presets
 		writeToLog("MainUI # Adding presets", 1);
 		for(int n = 0; n < presets.size(); n++)
@@ -1619,7 +1638,6 @@ public class MainUI extends JFrame implements DragGestureListener
 	
 	public void setItems(List<Item> items)
 	{
-		DragSource dragSource = new DragSource();
 		writeToLog("Adding all items to item panel", 1);
 		for(Item item : items)
 		{
@@ -1700,7 +1718,8 @@ public class MainUI extends JFrame implements DragGestureListener
 	public void addBuildGroup(ItemGroup group)
 	{
 		writeToLog("UI # Adding build group: "+group.getName());
-		ItemGroupPanel panel = new ItemGroupPanel(group.getName(), buildGroupList.getGroups().size(), itemFilterModel);
+		ItemGroupPanel panel = new ItemGroupPanel(main, group.getName(), buildGroupList.getGroups().size(), itemFilterModel);
+		dragSource.createDefaultDragGestureRecognizer(panel.getDragAndDropComponent(), DnDConstants.ACTION_MOVE, this);
 		panel.setItems(group);
 		buildGroupList.addGroup(panel);
 	}
@@ -1709,6 +1728,11 @@ public class MainUI extends JFrame implements DragGestureListener
 	{
 		writeToLog("UI # Removing build group at index: "+index);
 		buildGroupList.removeGroup(index);
+	}
+	
+	public void swapBuildGroups(final int index1, final int index2)
+	{
+		buildGroupList.swapGroups(index1, index2);
 	}
 	
 	public ItemGroup getBuildGroup(int index)
@@ -1759,16 +1783,12 @@ public class MainUI extends JFrame implements DragGestureListener
 				ItemGroup group = build.getGroups().get(n);
 				writeToLog(group.getName(), 2);
 				
-				ItemGroupPanel groupPanel = new ItemGroupPanel(group.getName(), n, itemFilterModel);
-				buildGroupList.addGroup(groupPanel);
-				
-				//groupPanel.refreshPanel();
-				//buildGroupList.revalidate();
-				//buildGroupList.repaint();
+				//ItemGroupPanel groupPanel = new ItemGroupPanel(group.getName(), n, itemFilterModel);
+				//buildGroupList.addGroup(groupPanel);
+				//groupPanel.setItems(group);
 				//groupPanel.refreshPanel();
 				
-				groupPanel.setItems(group);
-				groupPanel.refreshPanel();
+				addBuildGroup(group);
 			}
 		}
 		else
@@ -1940,15 +1960,32 @@ public class MainUI extends JFrame implements DragGestureListener
 	
 	//Drag and drop methods
 	
-	public void dragGestureRecognized(DragGestureEvent event)
+	public void dragGestureRecognized(DragGestureEvent evt)
 	{
-		writeToLog("Item being dragged");
 		Cursor cursor = null;
-		DraggableItem panel = (DraggableItem)event.getComponent();
-			
-		if(event.getDragAction() == DnDConstants.ACTION_COPY)
-			cursor = DragSource.DefaultCopyDrop;
+		Component dragged = evt.getComponent();
 		
-		event.startDrag(cursor, new TransferableItem(panel.getItem()));
+		//Item dragged
+		if(dragged instanceof DraggableItem)
+		{
+			writeToLog("Item being dragged");
+			DraggableItem panel = (DraggableItem)evt.getComponent();
+				
+			if(evt.getDragAction() == DnDConstants.ACTION_COPY)
+				cursor = DragSource.DefaultCopyDrop;
+			
+			evt.startDrag(cursor, new TransferableItem(panel.getItem()));
+		}
+		//Build group dragged
+		else if(dragged instanceof DraggableEditableLabel)
+		{
+			writeToLog("Build group being dragged");
+			ItemGroupPanel panel = ((DraggableEditableLabel)dragged).getParentItemGroup();
+			
+			if(evt.getDragAction() == DnDConstants.ACTION_MOVE)
+				cursor = DragSource.DefaultMoveDrop;
+			
+			evt.startDrag(cursor, new TransferableGroup(panel));
+		}
 	}
 }

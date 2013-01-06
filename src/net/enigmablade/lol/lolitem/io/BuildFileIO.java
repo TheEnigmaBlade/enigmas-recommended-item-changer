@@ -120,7 +120,7 @@ public class BuildFileIO
 	
 	private static ItemBuild loadBuild(File file, Champion actualChampion, GameMode actualMode)
 	{
-		writeToLog("BuildIO # Loading build: "+file.getName(), 3);
+		writeToLog("BuildIO # Loading build: "+file.getName());
 		//Parse JSON
 		JSONParser parser = new JSONParser();
 		JSONObject root = null;
@@ -131,13 +131,13 @@ public class BuildFileIO
 		}
 		catch(IOException e)
 		{
-			writeToLog("Could not find JSON file", 4, LoggingType.ERROR);
+			writeToLog("Could not find JSON file", 1, LoggingType.ERROR);
 			writeStackTrace(e);
 			return null;
 		}
 		catch(ParseException e)
 		{
-			writeToLog("Could not parse JSON", 4, LoggingType.ERROR);
+			writeToLog("Could not parse JSON", 1, LoggingType.ERROR);
 			writeStackTrace(e);
 			return null;
 		}
@@ -246,26 +246,26 @@ public class BuildFileIO
 		}
 		catch(Exception e)
 		{
-			writeToLog("Failed to load build data", 3, LoggingType.ERROR);
+			writeToLog("Failed to load build data", 1, LoggingType.ERROR);
 			writeStackTrace(e);
 			return null;
 		}
 		
 		if(mapID == null || modeID == null || groups == null)
 		{
-			writeToLog("Map ID, Mode ID, and blocks must exist", 3, LoggingType.ERROR);
+			writeToLog("Map ID, Mode ID, and blocks must exist", 1, LoggingType.ERROR);
 			return null;
 		}
 		
 		boolean bad = false;
 		if(actualChampion != null && (bad |= !actualChampion.getKey().equals(champion)))
-			writeToLog("Champion keys do not match: given \""+champion+"\", expected \""+actualChampion.getKey()+"\"", 3, LoggingType.WARNING);
+			writeToLog("Champion keys do not match: given \""+champion+"\", expected \""+actualChampion.getKey()+"\"", 1, LoggingType.WARNING);
 		if(actualMode != null)
 		{
 			if(!"any".equals(mapID) && (bad |= !actualMode.getMapID().equals(mapID)))
-				writeToLog("Map IDs do not match: given \""+mapID+"\", expected \""+actualMode.getMapID()+"\"", 3, LoggingType.WARNING);
+				writeToLog("Map IDs do not match: given \""+mapID+"\", expected \""+actualMode.getMapID()+"\"", 1, LoggingType.WARNING);
 			if(!"any".equals(mapID) && (bad |= !actualMode.getModeID().equals(modeID)))
-				writeToLog("Mode IDs do not match: given \""+modeID+"\", expected \""+actualMode.getModeID()+"\"", 3, LoggingType.WARNING);
+				writeToLog("Mode IDs do not match: given \""+modeID+"\", expected \""+actualMode.getModeID()+"\"", 1, LoggingType.WARNING);
 		}
 		if(bad)
 			return null;
@@ -302,19 +302,22 @@ public class BuildFileIO
 		}
 		
 		//Get all build files
-		File[] buildFiles = baseDir.listFiles();
+		File[] buildFiles = baseDir.listFiles();		
 		
 		//Filter out build files to match the mode
 		writeToLog("BuildIO # Filtering build files", 1);
 		
 		List<File> filteredBuildFiles = new ArrayList<File>(buildFiles.length);
+		System.out.println("Looking for map="+mode.getMapID()+", mode="+mode.getModeID());
 		for(File buildFile : buildFiles)
 		{
 			ItemBuild build = loadBuild(buildFile, null, null);
+			System.out.println(build.getName()+": map="+build.getMap()+", mode="+build.getMode());
+			System.out.println("    Maps="+(mode.getMapID().equals(build.getMap()))+", modes="+(mode.getModeID().equals(build.getMode())));
 			if(!"any".equals(build.getMap()) && mode.getMapID().equals(build.getMap()) && //If the file's map is not any and is equal to the build's map
-			   !"any".equals(build.getMode()) && mode.getModeID().equals(build.getMap())) //If the file's mode is not any and is equal to the build's mode
+			   !"any".equals(build.getMode()) && mode.getModeID().equals(build.getMode())) //If the file's mode is not any and is equal to the build's mode
 			{
-				writeToLog("BuildIO # "+buildFile.getName(), 2);
+				writeToLog("BuildIO # Adding to filtered: "+buildFile.getName(), 2);
 				filteredBuildFiles.add(buildFile);
 			}
 		}
@@ -337,11 +340,14 @@ public class BuildFileIO
 				ItemBuild build = itemBuilds.get(n);
 				File buildFile = new File(baseDir.getAbsolutePath()+"/"+"EnigmaItem_"+mode.getMapID()+"_"+mode.getModeID()+"-"+n+".json");
 				writeToLog("BuildIO # Saving to file: "+buildFile.getAbsolutePath(), 2);
+				System.out.println(build.getName());
 				SaveError newError = saveBuild(buildFile, champion, mode, build, n == primaryItemSet);
 				if(error == SaveError.NONE)
 					error = newError;
 			}
 		}
+		else
+			writeToLog("BuildIO # No item builds to save!", 2);
 		
 		return error;
 	}
@@ -351,40 +357,49 @@ public class BuildFileIO
 	{
 		JSONObject root = new JSONObject();
 		
-		root.put("champion", champion.getKey());
-		root.put("title", build.getName());
-		root.put("type", build.getType());
-		root.put("_author", build.getAuthor());
-		root.put("_notes", build.getDescription().replaceAll("\n", "\\n"));
-		root.put("map", mode.getMapID());
-		root.put("mode", mode.getModeID());
-		root.put("priority", isPrimary);
-		
-		//Add groups
-		JSONArray blocks = new JSONArray();
-		for(ItemGroup group : build.getGroups())
+		try
 		{
-			JSONObject groupObject = new JSONObject();
-			groupObject.put("type", group.getName());
+			root.put("champion", champion.getKey());
+			root.put("title", build.getName());
+			root.put("type", build.getType());
+			root.put("_author", build.getAuthor());
+			root.put("_notes", build.getDescription().replaceAll("\n", "\\\n"));
+			root.put("map", mode.getMapID());
+			root.put("mode", mode.getModeID());
+			root.put("priority", isPrimary);
 			
-			//Add items
-			JSONArray items = new JSONArray();
-			List<Item> itemList = group.getItems();
-			List<Integer> itemCountList = group.getItemCounts();
-			for(int n = 0; n < itemList.size(); n++)
+			//Add groups
+			JSONArray blocks = new JSONArray();
+			for(ItemGroup group : build.getGroups())
 			{
-				Item item = itemList.get(n);
-				int count = itemCountList.get(n);
-				JSONObject itemObject = new JSONObject();
-				itemObject.put("id", item.getID());
-				itemObject.put("count", count);
-				items.add(itemObject);
+				JSONObject groupObject = new JSONObject();
+				groupObject.put("type", group.getName());
+				
+				//Add items
+				JSONArray items = new JSONArray();
+				List<Item> itemList = group.getItems();
+				List<Integer> itemCountList = group.getItemCounts();
+				for(int n = 0; n < itemList.size(); n++)
+				{
+					Item item = itemList.get(n);
+					int count = itemCountList.get(n);
+					JSONObject itemObject = new JSONObject();
+					itemObject.put("id", item.getID());
+					itemObject.put("count", count);
+					items.add(itemObject);
+				}
+				groupObject.put("items", items);
+				
+				blocks.add(groupObject);
 			}
-			groupObject.put("items", items);
-			
-			blocks.add(groupObject);
+			root.put("blocks", blocks);
 		}
-		root.put("blocks", blocks);
+		catch(Exception e)
+		{
+			writeToLog("Failed to construct JSON structure", 1, LoggingType.ERROR);
+			writeStackTrace(e);
+			return SaveError.UNKNOWN;
+		}
 		
 		FileWriter writer = null;
 		try
@@ -398,6 +413,11 @@ public class BuildFileIO
 		{
 			writeToLog("Failed to write to file", 1, LoggingType.ERROR);
 			writeStackTrace(e);
+			
+			if(file.exists())
+				file.delete();
+			
+			return SaveError.WRITE;
 		}
 		finally
 		{
@@ -408,8 +428,6 @@ public class BuildFileIO
 				}
 				catch(IOException e){}
 		}
-		
-		return SaveError.WRITE;
 	}
 	
 	//Helpers

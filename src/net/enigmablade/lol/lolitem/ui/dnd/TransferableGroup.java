@@ -1,20 +1,18 @@
 package net.enigmablade.lol.lolitem.ui.dnd;
 
 import java.awt.datatransfer.*;
-import net.enigmablade.lol.lolitem.ui.components.items.*;
-import net.enigmablade.lol.lollib.data.*;
 
+import net.enigmablade.lol.lolitem.ui.components.*;
 
-public class TransferableItem implements Transferable
+public class TransferableGroup implements Transferable
 {
-	public static DataFlavor itemFlavor = new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType+";class="+Item.class.getName(), "Item");
-	public static DataFlavor removableItemFlavor = new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType+";class="+DraggableItem.class.getName(), "Removable Item");
+	public static DataFlavor itemGroupFlavor = new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType+";class="+ItemGroupPanel.class.getName(), "Item Group Panel");
 	
-	private static DataFlavor[] supportedFlavors = {itemFlavor, removableItemFlavor};
+	private static DataFlavor[] supportedFlavors = {itemGroupFlavor};
 	
 	private Object data;
 	
-	public TransferableItem(Object d)
+	public TransferableGroup(Object d)
 	{
 		data = d;
 	}

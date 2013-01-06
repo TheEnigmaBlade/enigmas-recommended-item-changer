@@ -1,6 +1,8 @@
 package net.enigmablade.lol.lolitem.ui.components;
 
 import java.awt.*;
+import java.awt.datatransfer.*;
+import java.awt.dnd.*;
 import java.awt.event.*;
 import java.util.List;
 import javax.swing.*;
@@ -8,6 +10,7 @@ import javax.swing.border.*;
 import org.jdesktop.swingx.*;
 
 import net.enigmablade.paradoxion.ui.components.*;
+import net.enigmablade.paradoxion.util.Logger.*;
 
 import net.enigmablade.lol.lollib.ui.*;
 import net.enigmablade.lol.lollib.ui.pretty.*;
@@ -17,6 +20,7 @@ import net.enigmablade.lol.lolitem.*;
 import net.enigmablade.lol.lolitem.data.*;
 import net.enigmablade.lol.lolitem.data.filter.*;
 import net.enigmablade.lol.lolitem.ui.components.items.*;
+import net.enigmablade.lol.lolitem.ui.dnd.*;
 
 import static net.enigmablade.paradoxion.util.Logger.*;
 
@@ -26,7 +30,7 @@ public class ItemGroupPanel
 	private JXCollapsiblePane collapsiblePane;
 	private JPanel spacer;
 	
-	private EditableLabel nameLabel;
+	private DraggableEditableLabel nameLabel;
 	private JButton collapseButton;
 	private JButton actionsPopupButton;
 	private JButton removeButton;
@@ -41,17 +45,17 @@ public class ItemGroupPanel
 	
 	//Initialization
 	
-	public ItemGroupPanel(String name, int index, ItemFilterModel itemFilterModel)
+	public ItemGroupPanel(EnigmaItems main, String name, int index, ItemFilterModel itemFilterModel)
 	{
 		groupIndex = index;
 		
-		initComponents(itemFilterModel);
+		initComponents(main, itemFilterModel);
 		initActions();
 		
 		nameLabel.setText(name);
 	}
 	
-	private void initComponents(ItemFilterModel itemFilterModel)
+	private void initComponents(EnigmaItems main, ItemFilterModel itemFilterModel)
 	{
 		//Top panel
 		topPanel = new JPanel();
@@ -79,7 +83,7 @@ public class ItemGroupPanel
 		topPanel.add(tabPanel, BorderLayout.WEST);
 		tabPanel.setLayout(new BorderLayout(4, 0));
 		
-		nameLabel = new EditableLabel("");
+		nameLabel = new DraggableEditableLabel(main, this);
 		nameLabel.setCaretColor(UIUtil.FOREGROUND);
 		tabPanel.add(nameLabel, BorderLayout.CENTER);
 		
@@ -122,7 +126,7 @@ public class ItemGroupPanel
 		contentScrollPane.setBorder(new LineBorder(UIUtil.COMPONENT_BORDER, 1, false));
 		collapsiblePane.setContentPane(contentScrollPane);
 		
-		content = new BuildPanel(itemFilterModel);
+		content = new BuildPanel(main, this, itemFilterModel);
 		contentScrollPane.setViewportView(content);
 		
 		//Spacer
@@ -160,6 +164,13 @@ public class ItemGroupPanel
 			presetPopup= new JPopupMenu();
 		else
 			presetPopup.removeAll();
+		
+		//Add header
+		JMenuItem header = new JMenuItem("Presets");
+		header.setEnabled(false);
+		presetPopup.add(header);
+		
+		presetPopup.addSeparator();
 		
 		//Add presets
 		writeToLog("ItemGroupPanel # Adding presets", 1);
@@ -202,6 +213,70 @@ public class ItemGroupPanel
 		presetPopup.add(managePresets);
 	}
 	
+	public class DraggableEditableLabel extends EditableLabel
+	{
+		private EnigmaItems main;
+		private ItemGroupPanel parent;
+		
+		public DraggableEditableLabel(EnigmaItems main, ItemGroupPanel parent)
+		{
+			this.main = main;
+			this.parent = parent;
+			
+			new ItemGroupDropTargetListener();
+		}
+		
+		public ItemGroupPanel getParentItemGroup()
+		{
+			return parent;
+		}
+		
+		private class ItemGroupDropTargetListener extends DropTargetAdapter
+		{
+			public ItemGroupDropTargetListener()
+			{
+				new DropTarget(DraggableEditableLabel.this, DnDConstants.ACTION_COPY_OR_MOVE, this, true, null);
+			}
+			
+			public void drop(DropTargetDropEvent evt)
+			{
+				try
+				{
+					Transferable tr = evt.getTransferable();
+					int action = evt.getDropAction();
+					
+					if(action == DnDConstants.ACTION_MOVE)
+					{
+						if(evt.isDataFlavorSupported(TransferableGroup.itemGroupFlavor))
+						{
+							evt.acceptDrop(DnDConstants.ACTION_MOVE);
+							
+							ItemGroupPanel group = (ItemGroupPanel)tr.getTransferData(TransferableGroup.itemGroupFlavor);
+							main.swapBuildGroups(parent.getIndex(), group.getIndex());
+							
+							evt.dropComplete(true);
+							return;
+						}
+					}
+					evt.rejectDrop();
+					evt.dropComplete(false);
+				}
+				catch(Exception e)
+				{
+					writeToLog("Error occured when dropping on BuildPanel", LoggingType.ERROR);
+					writeStackTrace(e);
+					evt.rejectDrop();
+					evt.dropComplete(false);
+				}
+			}
+		}
+	}
+	
+	public Component getDragAndDropComponent()
+	{
+		return nameLabel;
+	}
+	
 	//Accessor methods
 	
 	public Component[] getComponents()
@@ -231,7 +306,12 @@ public class ItemGroupPanel
 	
 	public void setIndex(int index)
 	{
-		removeButton.setActionCommand(index+"");
+		groupIndex = index;
+	}
+	
+	public int getIndex()
+	{
+		return groupIndex;
 	}
 	
 	//Data methods

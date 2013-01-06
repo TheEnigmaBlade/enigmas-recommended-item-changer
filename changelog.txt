@@ -1,9 +1,14 @@
 Version 3.2.0
 -------------
 * Added item build and item group customizable presets
+* Added drag-and-drop reordering of item groups (drag the group name)
 * Adding "allowany:1" to options.txt will enable the ability to edit recommended items for "Any" mode (disabled by default in version 3.1.0)
 * Reduced size of items in build area so 8 items are visible at once
 * Fixed some UI elements not being pretty enough
+* Fixed some favorite champions from not appearing
+* Fixed multi-line notes from becoming non-multi-line notes
+* Fixed possible situations causing items to load incorrectly in-game
+* Fixed multiple issues related to saving builds
 * Other minor UI adjustments
 
 Version 3.1.1

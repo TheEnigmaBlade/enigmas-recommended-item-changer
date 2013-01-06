@@ -13,11 +13,16 @@ import static net.enigmablade.paradoxion.util.Logger.*;
 
 import net.enigmablade.lol.lollib.data.*;
 
+import net.enigmablade.lol.lolitem.*;
 import net.enigmablade.lol.lolitem.data.filter.*;
+import net.enigmablade.lol.lolitem.ui.components.*;
 import net.enigmablade.lol.lolitem.ui.dnd.*;
 
 public class BuildPanel extends JPanel implements DragGestureListener
 {
+	private EnigmaItems main;
+	private ItemGroupPanel parentItemGroup;
+	
 	private ArrayList<DraggableItem> items;
 	private int gap = 2;
 	
@@ -30,8 +35,10 @@ public class BuildPanel extends JPanel implements DragGestureListener
 	
 	private ItemFilterModel itemFilterModel;
 	
-	public BuildPanel(ItemFilterModel itemFilterModel)
+	public BuildPanel(EnigmaItems main, ItemGroupPanel parentItemGroup, ItemFilterModel itemFilterModel)
 	{
+		this.main = main;
+		this.parentItemGroup = parentItemGroup;
 		this.itemFilterModel = itemFilterModel;
 		
 		setLayout(new FlowLayout(FlowLayout.CENTER, gap, gap));
@@ -45,7 +52,7 @@ public class BuildPanel extends JPanel implements DragGestureListener
 		emptyFont = getFont().deriveFont(16);
 		
 		dragSource = new DragSource();
-		new ItemDropTargetListener();
+		new BuildPanelDropTargetListener();
 		
 		items = new ArrayList<DraggableItem>();
 		
@@ -75,9 +82,9 @@ public class BuildPanel extends JPanel implements DragGestureListener
 	
 	//Drag and drop stuff
 	
-	private class ItemDropTargetListener extends DropTargetAdapter
+	private class BuildPanelDropTargetListener extends DropTargetAdapter
 	{
-		public ItemDropTargetListener()
+		public BuildPanelDropTargetListener()
 		{
 			new DropTarget(BuildPanel.this, DnDConstants.ACTION_COPY_OR_MOVE, this, true, null);
 		}
@@ -93,37 +100,49 @@ public class BuildPanel extends JPanel implements DragGestureListener
 				{
 					if(evt.isDataFlavorSupported(TransferableItem.itemFlavor))
 					{
-						Item item = (Item)tr.getTransferData(TransferableItem.itemFlavor);
-						
 						evt.acceptDrop(DnDConstants.ACTION_COPY);
+						
+						Item item = (Item)tr.getTransferData(TransferableItem.itemFlavor);
 						addItem(item);
+						
 						evt.dropComplete(true);
 						return;
 					}
-					evt.dropComplete(false);
 				}
 				else if(action == DnDConstants.ACTION_MOVE)
 				{
 					if(evt.isDataFlavorSupported(TransferableItem.itemFlavor))
 					{
+						evt.acceptDrop(DnDConstants.ACTION_MOVE);
+						
 						DraggableItem item = (DraggableItem)tr.getTransferData(TransferableItem.itemFlavor);
 						BuildPanel source = (BuildPanel)item.getBuildParent();
-						
-						evt.acceptDrop(DnDConstants.ACTION_MOVE);
 						addItem(item.getItem());
 						source.removeItem(item);
+						
 						evt.dropComplete(true);
 						return;
 					}
-					evt.dropComplete(false);
+					else if(evt.isDataFlavorSupported(TransferableGroup.itemGroupFlavor))
+					{
+						evt.acceptDrop(DnDConstants.ACTION_MOVE);
+						
+						ItemGroupPanel group = (ItemGroupPanel)tr.getTransferData(TransferableGroup.itemGroupFlavor);
+						main.swapBuildGroups(parentItemGroup.getIndex(), group.getIndex());
+						
+						evt.dropComplete(true);
+						return;
+					}
 				}
 				evt.rejectDrop();
+				evt.dropComplete(false);
 			}
 			catch(Exception e)
 			{
-				writeToLog("Error occured when dragging from BuildPanel", LoggingType.ERROR);
+				writeToLog("Error occured when dropping on BuildPanel", LoggingType.ERROR);
 				writeStackTrace(e);
 				evt.rejectDrop();
+				evt.dropComplete(false);
 			}
 		}
 	}
@@ -155,11 +174,11 @@ public class BuildPanel extends JPanel implements DragGestureListener
 		{
 			int itemWidth = items.get(0).getWidth();
 			int itemHeight = items.get(0).getHeight();
-			System.out.println("Item size: "+itemWidth+"x"+itemHeight);
+			//System.out.println("Item size: "+itemWidth+"x"+itemHeight);
 			int numCols = (getWidth()-gap)/(itemWidth+gap);
-			System.out.println("Num cols: "+numCols);
+			//System.out.println("Num cols: "+numCols);
 			int numRows = items.size()/numCols+(items.size() > numCols && items.size()%numCols > 0 ? 1 : 0);
-			System.out.println("Num rows: "+numRows);
+			//System.out.println("Num rows: "+numRows);
 			setPreferredSize(new Dimension(0, (numRows*itemHeight)+((numRows+1)*gap)));
 		}
 	}
