@@ -1,4 +1,0 @@
-name:Enigma's Recommended Item Changer
-size:1352
-files:Enigma Item Changer.exe,Updater.exe,Association Installer.exe,cache.dat,changelog.txt,license.txt
-run:Enigma Item Changer.exe
