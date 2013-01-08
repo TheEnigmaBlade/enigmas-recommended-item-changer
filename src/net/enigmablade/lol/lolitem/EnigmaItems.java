@@ -32,7 +32,7 @@ public class EnigmaItems
 {
 	public static final String appName = "Enigma's Recommended Item Changer";
 	public static final String appKey = "EnigmaItem";
-	public static final String version = "3.2.0", buildVersion = "0", versionAdd = "beta";
+	public static final String version = "3.2.0", buildVersion = "1", versionAdd = "";
 	
 	//UI
 	private MainUI ui;
@@ -97,26 +97,32 @@ public class EnigmaItems
 		//Game path
 		SplashScreen.drawString("Finding paths...");
 		writeToLog("Initializing LoL file IO");
-		GamePathUtil.initialize(options.lolDirPath, Region.stringToRegion(options.lolDirRegion));
+		boolean success = GamePathUtil.initialize(options.lolDirPath, Region.stringToRegion(options.lolDirRegion));
 		
-		//UI
-		SplashScreen.drawString("Loading UI...");
-		writeToLog("Initializing UI");
-		initUI();
-		
-		//Data
-		SplashScreen.drawString("Loading data...");
-		
-		SplashScreen.drawSubString("Default items");
-		BuildFileIO.initDefaultItems(appKey);
-		
-		writeToLog("Initializing item data");
-		SplashScreen.drawSubString("Items");
-		boolean success = loadItems();
-		writeToLog("Initializing champion data");
-		SplashScreen.drawSubString("Champions");
-		success &= loadChampions();
-		
+		if(success)
+		{
+			//Set path in options
+			options.lolDirPath = GamePathUtil.getDir().getPath();
+			options.lolDirRegion = GamePathUtil.getDir().getRegion().toString();
+			
+			//UI
+			SplashScreen.drawString("Loading UI...");
+			writeToLog("Initializing UI");
+			initUI();
+			
+			//Data
+			SplashScreen.drawString("Loading data...");
+			
+			SplashScreen.drawSubString("Default items");
+			BuildFileIO.initDefaultItems(appKey);
+			
+			writeToLog("Initializing item data");
+			SplashScreen.drawSubString("Items");
+			success &= loadItems();
+			writeToLog("Initializing champion data");
+			SplashScreen.drawSubString("Champions");
+			success &= loadChampions();
+		}
 		if(success)
 		{
 			initPresets();
@@ -639,7 +645,7 @@ public class EnigmaItems
 				do
 				{
 					picked = ItemDatabase.getItem(pickedID = itemIDs[(int)(Math.random()*itemIDs.length)]);
-				}while(picked.getEpicness() == 0 || boots.contains(pickedID) || exclude.contains(pickedID) || pickedItems.contains(picked));
+				}while(picked.getEpicness() == 0 || (picked.getEpicness() == 1 && Math.random() < 0.5) || boots.contains(pickedID) || exclude.contains(pickedID) || pickedItems.contains(picked));
 				pickedItems.add(picked);
 				items.addItem(picked, 1);
 			}

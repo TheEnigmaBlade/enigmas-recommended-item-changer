@@ -308,12 +308,12 @@ public class BuildFileIO
 		writeToLog("BuildIO # Filtering build files", 1);
 		
 		List<File> filteredBuildFiles = new ArrayList<File>(buildFiles.length);
-		System.out.println("Looking for map="+mode.getMapID()+", mode="+mode.getModeID());
+		//System.out.println("Looking for map="+mode.getMapID()+", mode="+mode.getModeID());
 		for(File buildFile : buildFiles)
 		{
 			ItemBuild build = loadBuild(buildFile, null, null);
-			System.out.println(build.getName()+": map="+build.getMap()+", mode="+build.getMode());
-			System.out.println("    Maps="+(mode.getMapID().equals(build.getMap()))+", modes="+(mode.getModeID().equals(build.getMode())));
+			//System.out.println(build.getName()+": map="+build.getMap()+", mode="+build.getMode());
+			//System.out.println("    Maps="+(mode.getMapID().equals(build.getMap()))+", modes="+(mode.getModeID().equals(build.getMode())));
 			if(!"any".equals(build.getMap()) && mode.getMapID().equals(build.getMap()) && //If the file's map is not any and is equal to the build's map
 			   !"any".equals(build.getMode()) && mode.getModeID().equals(build.getMode())) //If the file's mode is not any and is equal to the build's mode
 			{
@@ -340,7 +340,7 @@ public class BuildFileIO
 				ItemBuild build = itemBuilds.get(n);
 				File buildFile = new File(baseDir.getAbsolutePath()+"/"+"EnigmaItem_"+mode.getMapID()+"_"+mode.getModeID()+"-"+n+".json");
 				writeToLog("BuildIO # Saving to file: "+buildFile.getAbsolutePath(), 2);
-				System.out.println(build.getName());
+				//System.out.println(build.getName());
 				SaveError newError = saveBuild(buildFile, champion, mode, build, n == primaryItemSet);
 				if(error == SaveError.NONE)
 					error = newError;

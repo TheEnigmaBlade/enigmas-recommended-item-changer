@@ -80,7 +80,7 @@ public class ItemGroupListPanel extends JPanel
 		}
 		group.addComponentListener(listener);
 		group.addRemoveListener(removeListener);
-		System.out.println("old="+group.getIndex()+", new="+groupPanels.size());
+		//System.out.println("old="+group.getIndex()+", new="+groupPanels.size());
 		group.setIndex(groupPanels.size());
 		
 		groupPanels.add(group);

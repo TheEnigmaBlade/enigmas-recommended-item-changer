@@ -1856,6 +1856,7 @@ public class MainUI extends JFrame implements DragGestureListener
 				public void actionPerformed(ActionEvent evt)
 				{
 					SwingUtilities.invokeLater(new Thread(){
+						@Override
 						public void run()
 						{
 							saveResponseCollapsiblePane.setCollapsed(true);
@@ -1870,37 +1871,33 @@ public class MainUI extends JFrame implements DragGestureListener
 	
 	public void setItemDisplayMode(ItemDisplayMode mode)
 	{
-		//if(!disableItemModeUpdate)
+		disableItemModeUpdate = true;
+		itemModeMenuItems.get(options.itemDisplayMode).setSelected(true);
+		disableItemModeUpdate = false;
+		
+		draggableItemGridPanel.updateContents(false);
+		draggableItemListPanel.updateContents(false);
+		
+		DraggableItemContainer dragItemCont = null;
+		switch(mode)
 		{
-			disableItemModeUpdate = true;
-			itemModeMenuItems.get(options.itemDisplayMode).setSelected(true);
-			disableItemModeUpdate = false;
-			
-			draggableItemGridPanel.updateContents(false);
-			draggableItemListPanel.updateContents(false);
-			
-			DraggableItemContainer dragItemCont = null;
-			switch(mode)
-			{
-				case GRID: dragItemCont = draggableItemGridPanel;
-					break;
-				case LIST: dragItemCont = draggableItemListPanel;
-					break;
-			}
-			
-			String nextMode = mode.getNextMode().toString().toLowerCase();
-			Icon icon = ResourceLoader.getImageIcon("button_"+nextMode+".png");
-			draggableItemsModeButton.setIcon(icon);
-			//TODO: localization
-			//draggableItemsModeButton.setToolTipText(String.format(getString("main.items.mode.tooltip"), getString("main.menu.options.itemMode."+nextMode)));
-			
-			draggableItemsScrollPane.getViewport().removeAll();
-			draggableItemsScrollPane.setViewportView(dragItemCont);
-			dragItemCont.updateContents(true);
-			
-			draggableItemsScrollPane.revalidate();
-			draggableItemsScrollPane.repaint();
+			case GRID: dragItemCont = draggableItemGridPanel;
+			break;
+			case LIST: dragItemCont = draggableItemListPanel;
+			break;
 		}
+		
+		String nextMode = mode.getNextMode().toString().toLowerCase();
+		Icon icon = ResourceLoader.getImageIcon("button_"+nextMode+".png");
+		draggableItemsModeButton.setIcon(icon);
+		draggableItemsModeButton.setToolTipText(String.format("Switch to %s mode", nextMode));
+		
+		draggableItemsScrollPane.getViewport().removeAll();
+		draggableItemsScrollPane.setViewportView(dragItemCont);
+		dragItemCont.updateContents(true);
+		
+		draggableItemsScrollPane.revalidate();
+		draggableItemsScrollPane.repaint();
 	}
 	
 	public void setItemImageSize(int size)

@@ -10,3 +10,6 @@
 /src/enigma/installer
 /src/resources/installer/config.txt
 /presets.xml
+/export.xml
+/export.properties
+/todo.txt

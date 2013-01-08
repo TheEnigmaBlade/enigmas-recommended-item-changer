@@ -307,6 +307,7 @@ public class ItemGroupPanel
 	public void setIndex(int index)
 	{
 		groupIndex = index;
+		removeButton.setActionCommand(index+"");
 	}
 	
 	public int getIndex()

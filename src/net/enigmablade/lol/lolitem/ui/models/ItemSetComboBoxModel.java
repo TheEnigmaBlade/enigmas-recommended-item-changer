@@ -29,7 +29,7 @@ public class ItemSetComboBoxModel extends DefaultComboBoxModel<String>
 	private void updateModel()
 	{
 		writeToLog("Rebuilding item set combo box model");
-		System.out.println("Rebuilding item set model");
+		//System.out.println("Rebuilding item set model");
 		
 		Object selected = getSelectedItem();
 		removeAllElements();
@@ -38,7 +38,7 @@ public class ItemSetComboBoxModel extends DefaultComboBoxModel<String>
 		//Add global item sets
 		if(globalBuilds.size() > 0)
 		{
-			System.out.println("\tAdding globals");
+			//System.out.println("\tAdding globals");
 			addElement("---Global Builds");
 			boolean added = addToModel(globalBuilds);
 			anyAdded |= added;
@@ -53,7 +53,7 @@ public class ItemSetComboBoxModel extends DefaultComboBoxModel<String>
 			}
 		}
 		//Add normal item sets
-		System.out.println("\tAdding normals");
+		//System.out.println("\tAdding normals");
 		boolean added = addToModel(normalBuilds);
 		anyAdded |= added;
 		if(!added && anyAdded)

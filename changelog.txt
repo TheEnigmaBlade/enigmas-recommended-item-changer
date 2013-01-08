@@ -8,6 +8,7 @@ Version 3.2.0
 * Fixed some UI elements not being pretty enough
 * Fixed some favorite champions from not appearing
 * Fixed multi-line notes from becoming non-multi-line notes
+* Fixed boot enchantments from not displaying when filtering by movement
 * Fixed possible situations causing items to load incorrectly in-game
 * Fixed multiple issues related to saving builds
 * Other minor UI adjustments
