@@ -2,6 +2,7 @@ package net.enigmablade.lol.lolitem.ui.tooltip;
 
 import java.awt.*;
 import java.util.*;
+import net.enigmablade.lol.lollib.ui.*;
 
 import static net.enigmablade.paradoxion.util.Logger.*;
 
@@ -12,14 +13,15 @@ public class TooltipUtil
 	
 	static
 	{
-		Color physicalColor = new Color(210, 160, 0);
-		Color speedColor = Color.green.darker();
-		Color magicColor = new Color(150, 0, 200);
-		Color defenseColor = new Color(75, 75, 75);
-		Color healthColor = Color.red;
-		Color manaColor = Color.blue;
-		Color movementColor = Color.black;
-		Color tenacityColor = Color.blue.brighter();
+		int adj = 40;
+		Color physicalColor = UIUtil.adjust(new Color(210, 160, 0), adj);
+		Color speedColor = UIUtil.adjust(Color.green.darker(), adj);
+		Color magicColor = UIUtil.adjust(new Color(150, 0, 200), adj);
+		Color defenseColor = UIUtil.adjust(new Color(75, 75, 75), adj);
+		Color healthColor = UIUtil.adjust(Color.red, adj);
+		Color manaColor = UIUtil.adjust(Color.blue, adj);
+		Color movementColor = UIUtil.adjust(UIUtil.FOREGROUND, adj);
+		Color tenacityColor = UIUtil.adjust(Color.blue.brighter(), adj);
 		
 		//Types
 		shortTypes = new HashMap<String, String>();
@@ -43,11 +45,17 @@ public class TooltipUtil
 		shortTypes.put("health", "Health");
 		typeColors.put("health", healthColor);
 		
+		shortTypes.put("health regen per 5", "Health Regen");
+		typeColors.put("health regen per 5", healthColor);
+		
 		shortTypes.put("health regen per 5 seconds", "Health Regen");
 		typeColors.put("health regen per 5 seconds", healthColor);
 		
 		shortTypes.put("mana", "Mana");
 		typeColors.put("mana", manaColor);
+		
+		shortTypes.put("mana regen per 5", "Mana Regen");
+		typeColors.put("mana regen per 5", manaColor);
 		
 		shortTypes.put("mana regen per 5 seconds", "Mana Regen");
 		typeColors.put("mana regen per 5 seconds", manaColor);
@@ -59,6 +67,9 @@ public class TooltipUtil
 		typeColors.put("armor penetration", physicalColor);
 		
 		shortTypes.put("magic resist", "Magic Res");
+		typeColors.put("magic resist", defenseColor);
+		
+		shortTypes.put("magic resist", "Magic Resistance");
 		typeColors.put("magic resist", defenseColor);
 		
 		shortTypes.put("magic penetration", "Magic Pen");

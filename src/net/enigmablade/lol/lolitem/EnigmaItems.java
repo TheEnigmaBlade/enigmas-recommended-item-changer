@@ -32,7 +32,7 @@ public class EnigmaItems
 {
 	public static final String appName = "Enigma's Recommended Item Changer";
 	public static final String appKey = "EnigmaItem";
-	public static final String version = "3.2.0", buildVersion = "1", versionAdd = "";
+	public static final String version = "3.2.2", buildVersion = "0", versionAdd = "";
 	
 	//UI
 	private MainUI ui;
@@ -59,7 +59,7 @@ public class EnigmaItems
 	
 	//Start-up
 	
-	public EnigmaItems()
+	public EnigmaItems(boolean extractRaf)
 	{
 		writeToLog("App info: "+appName+" ("+appKey+"), v"+version+"b"+buildVersion+" "+versionAdd);
 		
@@ -75,7 +75,10 @@ public class EnigmaItems
 		if(options.checkVersion)
 		{
 			SplashScreen.drawString("Checking version...");
-			UpdateUtil.startUpdater(appKey, version, buildVersion, false);
+			if(UpdateUtil.startUpdater(appKey, version, buildVersion, "Enigma Item Changer.exe", false))
+				SystemUtil.exit(0);
+			else
+				SplashScreen.open();
 			UpdateUtil.startCacheUpdater(false, "items.xml");
 		}
 		
@@ -114,7 +117,8 @@ public class EnigmaItems
 			SplashScreen.drawString("Loading data...");
 			
 			SplashScreen.drawSubString("Default items");
-			BuildFileIO.initDefaultItems(appKey);
+			if(extractRaf)
+				BuildFileIO.initDefaultItems(appKey);
 			
 			writeToLog("Initializing item data");
 			SplashScreen.drawSubString("Items");
@@ -410,7 +414,7 @@ public class EnigmaItems
 		ui.swapBuildGroups(index1, index2);
 	}
 	
-	public void setGroupPreset(int groupIndex, String presetName)
+	public void setBuildGroupPreset(int groupIndex, String presetName)
 	{
 		writeToLog("Setting group "+groupIndex+" to preset "+presetName);
 		ItemGroup preset = presets.groupPresets.get(presetName);
@@ -553,7 +557,7 @@ public class EnigmaItems
 	
 	public void updateCheck()
 	{
-		UpdateUtil.startUpdater(appKey, version, buildVersion, true);
+		UpdateUtil.startUpdaterThreaded(appKey, version, buildVersion, "Enigma Item Changer.exe", true);
 	}
 	
 	public void updateCacheCheck()
@@ -806,20 +810,29 @@ public class EnigmaItems
 		{
 			writeToLog("Builds exist, size="+championBuilds.size(), 1);
 			List<String> names = new ArrayList<String>(championBuilds.size());
-			for(ItemBuild build : championBuilds)
+			int priorityIndex = -1;
+			for(int n = 0; n < championBuilds.size(); n++)
 			{
+				ItemBuild build = championBuilds.get(n);
 				writeToLog("Build: "+build.getName(), 2);
 				writeToLog("Author: "+build.getAuthor(), 3);
 				writeToLog("Type: "+build.getType(), 3);
 				for(ItemGroup group : build.getGroups())
 					writeToLog("Group: "+group.getName(), 3);
 				names.add(build.getName());
+				if(build.isPriority())
+				{
+					writeToLog("Is priority ("+n+")", 3);
+					priorityIndex = n;
+				}
 			}
 			
 			currentBuildIndex = -1;
 			oldBuildIndex = -1;
 			
 			ui.setBuilds(names);
+			if(priorityIndex != -1)
+				setBuild(priorityIndex);
 			ui.enableBuildEditing(true);
 		}
 	}

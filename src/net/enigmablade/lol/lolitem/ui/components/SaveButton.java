@@ -6,6 +6,7 @@ import javax.swing.*;
 
 import net.enigmablade.paradoxion.localization.*;
 
+import net.enigmablade.lol.lollib.ui.*;
 import net.enigmablade.lol.lollib.ui.pretty.*;
 
 
@@ -16,8 +17,8 @@ public class SaveButton extends PrettyButton
 		saveButtonTextFailure = "Save Failed";
 	
 	private Color baseColor,
-		successColor = new Color(0, 175, 0),
-		failureColor = new Color(175, 0, 0);
+		successColor = UIUtil.adjust(new Color(0, 175, 0), 50),
+		failureColor = UIUtil.adjust(new Color(175, 0, 0), 50);
 	
 	public SaveButton()
 	{

@@ -14,8 +14,11 @@ public class EnigmaItemsMain
 {
 	public static void main(String[] args)
 	{
+		//Generic args
 		boolean debugMode = false, consoleMode = false;
 		String champion = null, code = null;
+		//Program operation args
+		boolean noRaf = false;
 		
 		//Parse command-line arguments
 		for(int n = 0; n < args.length; n++)
@@ -28,6 +31,10 @@ public class EnigmaItemsMain
 			else if(arg.equals("-console"))
 			{
 				consoleMode = true;
+			}
+			else if(arg.equals("-noraf"))
+			{
+				noRaf = true;
 			}
 			else if(arg.startsWith("eric://"))
 			{
@@ -69,7 +76,7 @@ public class EnigmaItemsMain
 		//Create a new instance and parse the build code if required
 		try
 		{
-			EnigmaItems main = new EnigmaItems();
+			EnigmaItems main = new EnigmaItems(!noRaf);
 			
 			if(champion != null && code != null)
 			{

@@ -98,9 +98,14 @@ public class DraggableItem extends ItemPanel implements Comparable<DraggableItem
 			setToolTipText(item.getToolTip());
 		}
 		if(itemImage == null)
+		{
+			writeToLog("Item image for \""+item.getImage()+"\" not found", LoggingType.WARNING);
 			itemImage = baseItemImage = GamePathUtil.getItemImage("EmptyIcon");
-		if(itemImage == null)
-			itemImage = baseItemImage = ResourceLoader.getImage("null.png");
+			if(itemImage == null)
+				itemImage = baseItemImage = ResourceLoader.getImage("missing_items/EmptyIcon.png");
+			if(itemImage == null)
+				itemImage = baseItemImage = ResourceLoader.getImage("null.png");
+		}
 		
 		stats = item != null ? item.getStats() : new HashMap<String, String>();
 		

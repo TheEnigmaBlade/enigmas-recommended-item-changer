@@ -6,11 +6,12 @@
 /export
 /bin
 /.settings
-/resource-dev
+/resource_dev
 /src/enigma/installer
 /src/resources/installer/config.txt
 /presets.xml
 /export.xml
 /export.properties
 /todo.txt
-/old code
+/old_code
+/dev_tools

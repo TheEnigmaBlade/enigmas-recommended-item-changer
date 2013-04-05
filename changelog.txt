@@ -1,3 +1,17 @@
+Version 3.2.2
+-------------
+* Added an Aura filter option
+* Fixed item filter categories not filtering correctly (they changed values on me!)
+* Fixed Seeker's Armgard not showing up
+
+Version 3.2.1
+-------------
+* Fixed item images not appearing after the League of Legends 3.01 patch
+* Fixed group presets not functioning properly when modifying multiple builds
+* Fixed and modified minor aspects of the tooltips
+* Fixed grid item layout being too large in some instances
+* Other minor UI changes
+
 Version 3.2.0
 -------------
 * Added item build and item group customizable presets

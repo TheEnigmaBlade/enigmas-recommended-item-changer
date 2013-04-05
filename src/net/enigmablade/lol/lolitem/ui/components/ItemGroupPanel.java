@@ -183,7 +183,7 @@ public class ItemGroupPanel
 				@Override
 				public void actionPerformed(ActionEvent evt)
 				{
-					main.setGroupPreset(presetIndex, evt.getActionCommand());
+					main.setBuildGroupPreset(presetIndex, evt.getActionCommand());
 				}
 			});
 			presetPopup.add(i);
@@ -319,7 +319,7 @@ public class ItemGroupPanel
 	
 	public void setItems(ItemGroup set)
 	{
-		content.removeAll();
+		content.clear();
 		
 		List<Item> items = set.getItems();
 		List<Integer> itemCounts = set.getItemCounts();

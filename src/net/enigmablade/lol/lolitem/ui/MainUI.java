@@ -113,6 +113,7 @@ public class MainUI extends JFrame implements DragGestureListener
 	private ItemFilterModel itemFilterModel;
 	
 	private DragSource dragSource;
+	private PrettyCheckBox auraCheckBox;
 	
 	//Initialization
 	
@@ -722,7 +723,7 @@ public class MainUI extends JFrame implements DragGestureListener
 		setPreferredSize(new Dimension(800, 600));
 		setMinimumSize(new Dimension(740, 400));
 		setResizable(true);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setIconImage(ResourceLoader.getIcon());
 		setTitle(EnigmaItems.appName);
 		
@@ -1010,6 +1011,7 @@ public class MainUI extends JFrame implements DragGestureListener
 		
 		descriptionField = new PrettyTextArea();
 		descriptionField.setLineWrap(true);
+		descriptionField.setTabSize(2);
 		descriptionField.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		descriptionScrollPane.setViewportView(descriptionField);
 		//buildPanel.add(separator, gbc_separator);
@@ -1237,14 +1239,14 @@ public class MainUI extends JFrame implements DragGestureListener
 		gbc_mCheckBox.gridy = 2;
 		filtersPanel.add(mCheckBox, gbc_mCheckBox);
 		
-		mvCheckBox = new PrettyCheckBox("Movement");
-		mvCheckBox.setActionCommand(ItemProperty.MOVEMENT.name());
-		filterCheckBoxes.add(mvCheckBox);
-		GridBagConstraints gbc_mvCheckBox = new GridBagConstraints();
-		gbc_mvCheckBox.anchor = GridBagConstraints.WEST;
-		gbc_mvCheckBox.gridx = 4;
-		gbc_mvCheckBox.gridy = 2;
-		filtersPanel.add(mvCheckBox, gbc_mvCheckBox);
+		auraCheckBox = new PrettyCheckBox("Aura");
+		auraCheckBox.setActionCommand(ItemProperty.AURA.name());
+		filterCheckBoxes.add(auraCheckBox);
+		GridBagConstraints gbc_chckbxAura = new GridBagConstraints();
+		gbc_chckbxAura.anchor = GridBagConstraints.WEST;
+		gbc_chckbxAura.gridx = 4;
+		gbc_chckbxAura.gridy = 2;
+		filtersPanel.add(auraCheckBox, gbc_chckbxAura);
 		
 		arPenCheckBox = new PrettyCheckBox("Armor Pen");
 		arPenCheckBox.setActionCommand(ItemProperty.ARMOR_PEN.name());
@@ -1273,14 +1275,14 @@ public class MainUI extends JFrame implements DragGestureListener
 		gbc_mRegenCheckBox.gridy = 3;
 		filtersPanel.add(mRegenCheckBox, gbc_mRegenCheckBox);
 		
-		consumeCheckBox = new PrettyCheckBox("Consumable");
-		consumeCheckBox.setActionCommand(ItemProperty.CONSUMABLE.name());
-		filterCheckBoxes.add(consumeCheckBox);
-		GridBagConstraints gbc_consumeCheckBox = new GridBagConstraints();
-		gbc_consumeCheckBox.anchor = GridBagConstraints.WEST;
-		gbc_consumeCheckBox.gridx = 4;
-		gbc_consumeCheckBox.gridy = 3;
-		filtersPanel.add(consumeCheckBox, gbc_consumeCheckBox);
+		mvCheckBox = new PrettyCheckBox("Movement");
+		mvCheckBox.setActionCommand(ItemProperty.MOVEMENT.name());
+		filterCheckBoxes.add(mvCheckBox);
+		GridBagConstraints gbc_mvCheckBox = new GridBagConstraints();
+		gbc_mvCheckBox.anchor = GridBagConstraints.WEST;
+		gbc_mvCheckBox.gridx = 4;
+		gbc_mvCheckBox.gridy = 3;
+		filtersPanel.add(mvCheckBox, gbc_mvCheckBox);
 		
 		critCheckBox = new PrettyCheckBox("Critical Chance");
 		critCheckBox.setActionCommand(ItemProperty.CRITICAL.name());
@@ -1299,6 +1301,15 @@ public class MainUI extends JFrame implements DragGestureListener
 		gbc_tenCheckBox.gridx = 3;
 		gbc_tenCheckBox.gridy = 4;
 		filtersPanel.add(tenCheckBox, gbc_tenCheckBox);
+		
+		consumeCheckBox = new PrettyCheckBox("Consumable");
+		consumeCheckBox.setActionCommand(ItemProperty.CONSUMABLE.name());
+		filterCheckBoxes.add(consumeCheckBox);
+		GridBagConstraints gbc_consumeCheckBox = new GridBagConstraints();
+		gbc_consumeCheckBox.anchor = GridBagConstraints.WEST;
+		gbc_consumeCheckBox.gridx = 4;
+		gbc_consumeCheckBox.gridy = 4;
+		filtersPanel.add(consumeCheckBox, gbc_consumeCheckBox);
 		
 		draggableItemsScrollPane = new JScrollPane();
 		draggableItemsScrollPane.setBorder(new LineBorder(UIUtil.BORDER));

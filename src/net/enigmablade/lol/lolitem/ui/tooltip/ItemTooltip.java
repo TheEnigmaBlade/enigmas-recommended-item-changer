@@ -214,14 +214,14 @@ public class ItemTooltip extends JToolTip
 			
 			BufferedReader br = new BufferedReader(new StringReader(tipText));
 			String line;
-			List<String> newLines = new ArrayList<String>();
+			lines = new LinkedList<String>();
 			try
 			{
 				while((line = br.readLine()) != null)
 				{
 					int width = SwingUtilities.computeStringWidth(metrics, line);
 					maxWidth = (maxWidth < width) ? width : maxWidth;
-					newLines.add(line);
+					lines.add(line);
 				}
 			}
 			catch(IOException e)
@@ -229,7 +229,6 @@ public class ItemTooltip extends JToolTip
 				e.printStackTrace();
 			}
 			
-			lines = new ArrayList<String>(newLines);
 			int height = metrics.getHeight()*lines.size();
 			
 			return new Dimension(maxWidth+6, height+topHeight+statsHeight+4);

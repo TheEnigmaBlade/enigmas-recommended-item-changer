@@ -4,7 +4,6 @@ import java.awt.*;
 import java.awt.event.*;
 import net.enigmablade.lol.lolitem.ui.models.*;
 
-
 public class DraggableItemGridContainer extends	DraggableItemContainer
 {
 	public DraggableItemGridContainer(DraggableItemContainerModel m, ActionListener list, ActionListener returnList)
@@ -30,7 +29,8 @@ public class DraggableItemGridContainer extends	DraggableItemContainer
 		int width = getParent() != null ? getParent().getWidth() : 0;
 		if(width > 0)
 		{
-			int inRow = (width-itemGap-(width%itemGap))/(itemSize+itemGap);
+			//int inRow = (width-itemGap-(width%itemGap))/(itemSize+itemGap);
+			int inRow = (width)/(itemSize+itemGap);
 			int size = model.getSize();
 			int numFullRows = size/inRow;
 			int modRows = size%inRow;

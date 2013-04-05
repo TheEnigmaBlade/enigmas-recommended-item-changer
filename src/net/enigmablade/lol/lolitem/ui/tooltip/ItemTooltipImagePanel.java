@@ -5,7 +5,6 @@ import javax.swing.*;
 import net.enigmablade.paradoxion.util.*;
 import net.enigmablade.lol.lollib.io.*;
 
-
 public class ItemTooltipImagePanel extends JPanel
 {
 	private Image image;
@@ -19,7 +18,7 @@ public class ItemTooltipImagePanel extends JPanel
 		size = s;
 		initCorners();
 		
-		setImage("null");
+		setImage(null);
 		
 		setPreferredSize(new Dimension(size, size));
 	}
@@ -45,10 +44,12 @@ public class ItemTooltipImagePanel extends JPanel
 		{
 			image = GamePathUtil.getItemImage(name);
 			if(image == null)
-				ResourceLoader.getImage("missing_items/"+name+".png");
+				image = ResourceLoader.getImage("missing_items/"+name+".png");
 		}
 		if(image == null)
 			image = GamePathUtil.getItemImage("EmptyIcon");
+		if(image == null)
+			image = ResourceLoader.getImage("missing_items/EmptyIcon.png");
 		if(image == null)
 			image = ResourceLoader.getImage("null.png");
 		
