@@ -1,3 +1,8 @@
+Version 3.2.3
+-------------
+* Added the new ARAM map (Howling Abyss)
+* Fixed an issue where excess files in the champion folders would cause saving to fail
+
 Version 3.2.2
 -------------
 * Added an Aura filter option

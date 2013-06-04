@@ -32,7 +32,7 @@ public class EnigmaItems
 {
 	public static final String appName = "Enigma's Recommended Item Changer";
 	public static final String appKey = "EnigmaItem";
-	public static final String version = "3.2.2", buildVersion = "0", versionAdd = "";
+	public static final String version = "3.2.3", buildVersion = "1", versionAdd = "";
 	
 	//UI
 	private MainUI ui;

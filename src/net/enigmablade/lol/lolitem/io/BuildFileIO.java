@@ -76,9 +76,12 @@ public class BuildFileIO
 		
 		for(File buildFile : buildFiles)
 		{
-			ItemBuild build = loadBuild(buildFile, champion, mode);
-			if(build != null)
-				builds.add(build);
+			if(!buildFile.isDirectory() && buildFile.getName().endsWith(".json"))
+			{
+				ItemBuild build = loadBuild(buildFile, champion, mode);
+				if(build != null)
+					builds.add(build);
+			}
 		}
 		
 		//No builds were loaded
